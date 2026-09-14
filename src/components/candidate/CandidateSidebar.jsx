@@ -5,42 +5,22 @@ import {
 const navigation = [
   {
     name: 'Dashboard',
-    path: '/admin/dashboard',
+    path: '/candidate/dashboard',
     enabled: true,
   },
   {
-    name: 'Applications',
-    path: '/admin/applications',
-    enabled: true,
-  },
-  {
-    name: 'Leader Invitations',
-    path: '/admin/leader-invitations',
-    enabled: true,
-  },
-  {
-    name: 'Endorsement Tracking',
-    path: '/admin/endorsements',
-    enabled: true,
-  },
-  {
-    name: 'Admitted Students',
-    path: '/admin/students',
-    enabled: true,
-  },
-  {
-    name: 'Rooms',
-    path: '/admin/rooms',
+    name: 'My Application',
+    path: '/candidate/application',
     enabled: true,
   },
   {
     name: 'Profile',
-    path: '/admin/profile',
-    enabled: false,
+    path: '/candidate/profile',
+    enabled: true,
   },
 ];
 
-export default function AdminSidebar({
+function CandidateSidebar({
   open = false,
   onClose = () => {},
 }) {
@@ -49,7 +29,7 @@ export default function AdminSidebar({
       {open && (
         <button
           type="button"
-          aria-label="Close navigation menu"
+          aria-label="Close navigation"
           onClick={onClose}
           className="fixed inset-0 z-30 bg-slate-950/40 lg:hidden"
         />
@@ -62,14 +42,14 @@ export default function AdminSidebar({
             : '-translate-x-full'
         }`}
       >
-        <div className="flex h-20 shrink-0 items-center justify-between border-b border-slate-200 px-6">
+        <div className="flex h-20 items-center justify-between border-b border-slate-200 px-6">
           <div>
             <p className="text-xl font-bold text-blue-900">
               LightApp
             </p>
 
             <p className="text-xs font-semibold uppercase tracking-wider text-amber-600">
-              Admissions
+              LTC Admission
             </p>
           </div>
 
@@ -136,13 +116,13 @@ export default function AdminSidebar({
           )}
         </nav>
 
-        <div className="shrink-0 border-t border-slate-200 p-5">
+        <div className="border-t border-slate-200 p-5">
           <p className="text-xs font-semibold text-blue-900">
-            LTC Admission Portal
+            LTC Nigeria
           </p>
 
           <p className="mt-1 text-xs text-slate-500">
-            Secure application processing
+            Candidate admission portal
           </p>
         </div>
       </aside>
@@ -159,3 +139,5 @@ function NavigationIcon({
     </span>
   );
 }
+
+export default CandidateSidebar;

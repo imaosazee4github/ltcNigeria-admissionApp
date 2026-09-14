@@ -1,9 +1,10 @@
 import { supabase } from '../utils/supabase';
 
 export async function getLocalEndorsementQueue() {
-  const { data, error } = await supabase.rpc(
-    'get_local_endorsement_queue'
-  );
+  const { data, error } =
+    await supabase.rpc(
+      'get_local_endorsement_queue'
+    );
 
   if (error) {
     throw new Error(error.message);
@@ -40,6 +41,7 @@ export async function submitLocalEndorsement({
   applicationId,
   decision,
   comments,
+  responses,
 }) {
   if (!applicationId) {
     throw new Error(
@@ -53,15 +55,33 @@ export async function submitLocalEndorsement({
     );
   }
 
-  const { data, error } = await supabase.rpc(
-    'submit_local_endorsement',
-    {
-      p_application_id: applicationId,
-      p_decision: decision,
-      p_comments:
-        comments?.trim() || null,
-    }
-  );
+  if (
+    !responses ||
+    typeof responses !== 'object' ||
+    Array.isArray(responses)
+  ) {
+    throw new Error(
+      'Complete the endorsement questions.'
+    );
+  }
+
+  const { data, error } =
+    await supabase.rpc(
+      'submit_local_endorsement',
+      {
+        p_application_id:
+          applicationId,
+
+        p_decision:
+          decision,
+
+        p_responses:
+          responses,
+
+        p_comments:
+          comments?.trim() || null,
+      }
+    );
 
   if (error) {
     throw new Error(error.message);

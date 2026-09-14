@@ -1,466 +1,504 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-
 import { Link } from 'react-router-dom';
 
 import AdminLayout from '../../layouts/AdminLayout';
-import { useAdminApplicationQueue } from '../../hooks/useAdminApplications';
+
+import {
+  useAdminDashboardSummary,
+} from '../../hooks/useAdminApplications';
 
 export default function AdminDashboard() {
   const {
-    data: applications = [],
+    data: summary,
     isLoading,
+    isFetching,
     error,
-  } = useAdminApplicationQueue();
+    refetch,
+  } = useAdminDashboardSummary();
 
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] =
-    useState('all');
-
-  const [
-    selectedApplicationId,
-    setSelectedApplicationId,
-  ] = useState(null);
-
-  const filteredApplications = useMemo(() => {
-    const searchValue =
-      search.trim().toLowerCase();
-
-    return applications.filter(
-      (application) => {
-        const candidate =
-          application.candidate_profiles;
-
-        const profile = candidate?.profiles;
-
-        const matchesSearch =
-          !searchValue ||
-          profile?.full_name
-            ?.toLowerCase()
-            .includes(searchValue) ||
-          profile?.email
-            ?.toLowerCase()
-            .includes(searchValue) ||
-          application.application_number
-            ?.toLowerCase()
-            .includes(searchValue);
-
-        const matchesStatus =
-          statusFilter === 'all' ||
-          application.status ===
-            statusFilter;
-
-        return (
-          matchesSearch && matchesStatus
-        );
-      }
+  if (isLoading) {
+    return (
+      <AdminLayout
+        title="Admissions Dashboard"
+        description="Monitor applications, endorsements and admitted students."
+      >
+        <PageNotice message="Loading admissions dashboard..." />
+      </AdminLayout>
     );
-  }, [
-    applications,
-    search,
-    statusFilter,
-  ]);
+  }
 
-  useEffect(() => {
-    if (
-      filteredApplications.length === 0
-    ) {
-      setSelectedApplicationId(null);
-      return;
-    }
+  if (error) {
+    return (
+      <AdminLayout
+        title="Admissions Dashboard"
+        description="Monitor applications, endorsements and admitted students."
+      >
+        <PageNotice
+          error
+          message={
+            error.message ||
+            'Unable to load the dashboard.'
+          }
+        />
+      </AdminLayout>
+    );
+  }
 
-    const selectedStillExists =
-      filteredApplications.some(
-        (application) =>
-          application.id ===
-          selectedApplicationId
-      );
+  const recentApplications =
+    summary?.recentApplications || [];
 
-    if (!selectedStillExists) {
-      setSelectedApplicationId(
-        filteredApplications[0].id
-      );
-    }
-  }, [
-    filteredApplications,
-    selectedApplicationId,
-  ]);
-
-  const selectedApplication =
-    filteredApplications.find(
-      (application) =>
-        application.id ===
-        selectedApplicationId
-    ) || null;
-
-  const pendingReviewCount =
-    applications.filter(
-      (application) =>
-        application.status ===
-        'pending_ltc_review'
-    ).length;
-
-  const correctionCount =
-    applications.filter(
-      (application) =>
-        application.status ===
-        'correction_required'
-    ).length;
-
-  const localEndorsementCount =
-    applications.filter(
-      (application) =>
-        application.status ===
-        'pending_local_endorsement'
-    ).length;
+  const actionRequired =
+    (summary?.pendingLtcReview || 0) +
+    (summary?.correctionRequired || 0);
 
   return (
     <AdminLayout
-      title="Admissions Processing Queue"
-      description="Review applications, verify documents and monitor endorsement progress."
+      title="Admissions Dashboard"
+      description="Monitor applications, endorsements and admitted students."
     >
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <SummaryCard
-          label="Total Applications"
-          value={applications.length}
-          color="blue"
-        />
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="rounded-lg border border-blue-900 px-5 py-3 text-sm font-semibold text-blue-900 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isFetching
+            ? 'Refreshing...'
+            : 'Refresh Dashboard'}
+        </button>
+      </div>
 
-        <SummaryCard
-          label="Pending LTC Review"
-          value={pendingReviewCount}
-          color="amber"
-        />
+      <section className="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-6">
+        <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-blue-700">
+              Admissions Overview
+            </p>
 
-        <SummaryCard
-          label="Correction Required"
-          value={correctionCount}
-          color="red"
-        />
+            <h2 className="mt-2 text-2xl font-bold text-blue-900">
+              {summary?.total || 0}{' '}
+              submitted application
+              {summary?.total === 1
+                ? ''
+                : 's'}
+            </h2>
 
-        <SummaryCard
-          label="Local Endorsement"
-          value={localEndorsementCount}
-          color="green"
-        />
-      </section>
-
-      <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 p-5">
-            <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
-              <div>
-                <h2 className="text-xl font-bold text-blue-900">
-                  Application Queue
-                </h2>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Select an application to view its
-                  processing status.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <input
-                  type="search"
-                  value={search}
-                  onChange={(event) =>
-                    setSearch(
-                      event.target.value
-                    )
-                  }
-                  placeholder="Search candidate..."
-                  className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-800 focus:ring-2 focus:ring-blue-100"
-                />
-
-                <select
-                  value={statusFilter}
-                  onChange={(event) =>
-                    setStatusFilter(
-                      event.target.value
-                    )
-                  }
-                  className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-                >
-                  <option value="all">
-                    All statuses
-                  </option>
-
-                  <option value="pending_ltc_review">
-                    Pending LTC Review
-                  </option>
-
-                  <option value="correction_required">
-                    Correction Required
-                  </option>
-
-                  <option value="pending_local_endorsement">
-                    Local Endorsement
-                  </option>
-
-                  <option value="pending_area_endorsement">
-                    Final Endorsement
-                  </option>
-
-                  <option value="approved">
-                    Approved
-                  </option>
-
-                  <option value="rejected">
-                    Rejected
-                  </option>
-                </select>
-              </div>
-            </div>
+            <p className="mt-2 text-sm text-slate-600">
+              {actionRequired > 0
+                ? `${actionRequired} application${
+                    actionRequired === 1
+                      ? ''
+                      : 's'
+                  } currently require attention.`
+                : 'There are no applications requiring immediate LTC Admin action.'}
+            </p>
           </div>
 
-          {isLoading && (
-            <PageNotice message="Loading applications..." />
-          )}
-
-          {error && (
-            <PageNotice
-              error
-              message={error.message}
-            />
-          )}
-
-          {!isLoading &&
-            !error &&
-            filteredApplications.length ===
-              0 && (
-              <PageNotice message="No applications match the selected filter." />
-            )}
-
-          {!isLoading &&
-            !error &&
-            filteredApplications.length >
-              0 && (
-              <div className="divide-y divide-slate-200">
-                {filteredApplications.map(
-                  (application) => (
-                    <ApplicationRow
-                      key={application.id}
-                      application={
-                        application
-                      }
-                      selected={
-                        application.id ===
-                        selectedApplicationId
-                      }
-                      onSelect={() =>
-                        setSelectedApplicationId(
-                          application.id
-                        )
-                      }
-                    />
-                  )
-                )}
-              </div>
-            )}
+          <Link
+            to="/admin/applications"
+            className="inline-flex items-center justify-center rounded-lg bg-blue-900 px-6 py-3 font-semibold text-white transition hover:bg-blue-800"
+          >
+            Open Applications
+          </Link>
         </div>
+      </section>
 
-        <ApplicationSummaryPanel
-          application={selectedApplication}
+      <section className="mt-6">
+        <SectionHeading
+          title="Action Required"
+          description="Applications currently requiring LTC Admin attention."
         />
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <DashboardCard
+            label="Pending LTC Review"
+            value={
+              summary?.pendingLtcReview ||
+              0
+            }
+            description="Submitted applications waiting for review"
+            color="amber"
+            path="/admin/applications"
+          />
+
+          <DashboardCard
+            label="Correction Required"
+            value={
+              summary?.correctionRequired ||
+              0
+            }
+            description="Applications returned to candidates"
+            color="red"
+            path="/admin/applications"
+          />
+
+          <DashboardCard
+            label="Admission Completed"
+            value={
+              summary?.admissionCompleted ||
+              0
+            }
+            description="Ready for room processing"
+            color="green"
+            path="/admin/applications"
+          />
+
+          <DashboardCard
+            label="Awaiting Room"
+            value={
+              summary?.awaitingRoom || 0
+            }
+            description="Admitted students without rooms"
+            color="cyan"
+            path="/admin/applications"
+          />
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <SectionHeading
+          title="Endorsement Progress"
+          description="Monitor applications currently with Church leaders."
+        />
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <DashboardCard
+            label="Pending Local Endorsement"
+            value={
+              summary
+                ?.pendingLocalEndorsement ||
+              0
+            }
+            description="Waiting for Bishop or Branch President"
+            color="blue"
+            path="/admin/applications"
+          />
+
+          <DashboardCard
+            label="Pending Final Endorsement"
+            value={
+              summary
+                ?.pendingFinalEndorsement ||
+              0
+            }
+            description="Waiting for Stake or District President"
+            color="purple"
+            path="/admin/applications"
+          />
+
+          <DashboardCard
+            label="Admitted Students"
+            value={
+              summary?.admittedStudents ||
+              0
+            }
+            description="Completed admission process"
+            color="green"
+            path="/admin/applications"
+          />
+
+          <DashboardCard
+            label="Rooms Allocated"
+            value={
+              summary?.roomAllocated || 0
+            }
+            description="Students with assigned rooms"
+            color="cyan"
+            path="/admin/applications"
+          />
+        </div>
+      </section>
+
+      <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <RecentApplications
+          applications={
+            recentApplications
+          }
+        />
+
+        <QuickActions />
       </section>
     </AdminLayout>
   );
 }
 
-function ApplicationRow({
-  application,
-  selected,
-  onSelect,
+function DashboardCard({
+  label,
+  value,
+  description,
+  color,
+  path,
 }) {
-  const candidate =
-    application.candidate_profiles;
+  const colors = {
+    amber: {
+      border: 'border-amber-200',
+      background: 'bg-amber-50',
+      value: 'text-amber-800',
+    },
 
-  const profile = candidate?.profiles;
+    red: {
+      border: 'border-red-200',
+      background: 'bg-red-50',
+      value: 'text-red-700',
+    },
+
+    blue: {
+      border: 'border-blue-200',
+      background: 'bg-blue-50',
+      value: 'text-blue-800',
+    },
+
+    purple: {
+      border: 'border-purple-200',
+      background: 'bg-purple-50',
+      value: 'text-purple-800',
+    },
+
+    green: {
+      border: 'border-emerald-200',
+      background: 'bg-emerald-50',
+      value: 'text-emerald-800',
+    },
+
+    cyan: {
+      border: 'border-cyan-200',
+      background: 'bg-cyan-50',
+      value: 'text-cyan-800',
+    },
+  };
+
+  const selectedColor =
+    colors[color] || colors.blue;
 
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`w-full p-5 text-left transition ${
-        selected
-          ? 'bg-blue-50'
-          : 'bg-white hover:bg-slate-50'
-      }`}
+    <Link
+      to={path}
+      className={`rounded-xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${selectedColor.border} ${selectedColor.background}`}
     >
-      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-        <div>
-          <p className="font-bold text-slate-900">
-            {profile?.full_name ||
-              'Unknown candidate'}
-          </p>
+      <p className="text-sm font-semibold text-slate-700">
+        {label}
+      </p>
 
-          <p className="mt-1 text-sm text-slate-500">
-            {application.application_number ||
-              'Application number not assigned'}
-          </p>
+      <p
+        className={`mt-3 text-3xl font-bold ${selectedColor.value}`}
+      >
+        {value}
+      </p>
 
-          <p className="mt-1 text-xs text-slate-500">
-            {candidate?.local_unit_name ||
-              'Church unit not provided'}
-          </p>
-        </div>
-
-        <StatusBadge
-          status={application.status}
-        />
-      </div>
-    </button>
+      <p className="mt-3 text-xs leading-5 text-slate-600">
+        {description}
+      </p>
+    </Link>
   );
 }
 
-function ApplicationSummaryPanel({
-  application,
+function RecentApplications({
+  applications,
 }) {
-  if (!application) {
-    return (
-      <aside className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-bold text-blue-900">
-          Application Verification
-        </h2>
-
-        <p className="mt-4 text-sm text-slate-500">
-          Select an application from the queue.
-        </p>
-      </aside>
-    );
-  }
-
-  const candidate =
-    application.candidate_profiles;
-
-  const profile = candidate?.profiles;
-
   return (
-    <aside className="h-fit rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">
-        Application Verification
-      </p>
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <div>
+          <h2 className="text-xl font-bold text-blue-900">
+            Recent Applications
+          </h2>
 
-      <h2 className="mt-2 text-xl font-bold text-blue-900">
-        {profile?.full_name ||
-          'Unknown candidate'}
+          <p className="mt-1 text-sm text-slate-500">
+            Most recently submitted
+            applications.
+          </p>
+        </div>
+
+        <Link
+          to="/admin/applications"
+          className="text-sm font-semibold text-blue-800 hover:underline"
+        >
+          View all
+        </Link>
+      </div>
+
+      {applications.length === 0 ? (
+        <div className="p-10 text-center text-sm text-slate-500">
+          No submitted applications are
+          available.
+        </div>
+      ) : (
+        <div className="divide-y divide-slate-100">
+          {applications.map(
+            (application) => {
+              const candidate =
+                application
+                  .candidate_profiles;
+
+              const profile =
+                candidate?.profiles;
+
+              return (
+                <article
+                  key={application.id}
+                  className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center"
+                >
+                  <div>
+                    <p className="font-bold text-slate-900">
+                      {profile?.full_name ||
+                        'Unknown candidate'}
+                    </p>
+
+                    <p className="mt-1 text-sm text-slate-500">
+                      {application.application_number ||
+                        'Application number pending'}
+                    </p>
+
+                    <p className="mt-1 text-xs text-slate-400">
+                      {application
+                        .admission_intakes
+                        ?.name ||
+                        'Current intake'}
+                      {' · '}
+                      {formatDate(
+                        application.submitted_at
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-start gap-2 sm:items-end">
+                    <StatusBadge
+                      status={
+                        application.status
+                      }
+                    />
+
+                    <Link
+                      to={`/admin/applications/${application.id}`}
+                      className="text-sm font-semibold text-blue-800 hover:underline"
+                    >
+                      View application
+                    </Link>
+                  </div>
+                </article>
+              );
+            }
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function QuickActions() {
+  return (
+    <section className="h-fit rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 className="text-xl font-bold text-blue-900">
+        Quick Actions
       </h2>
 
       <p className="mt-1 text-sm text-slate-500">
-        {application.application_number}
+        Common admission-management tasks.
       </p>
 
-      <div className="mt-5 space-y-4">
-        <SummaryItem
-          label="Email"
-          value={profile?.email}
+      <div className="mt-6 space-y-3">
+        <QuickAction
+          title="Review Applications"
+          description="Open the processing queue"
+          path="/admin/applications"
+          primary
         />
 
-        <SummaryItem
-          label="Phone"
-          value={profile?.phone}
+        <QuickAction
+          title="Invite Area Leader"
+          description="Invite a Stake or District President"
+          path="/admin/leader-invitations"
         />
 
-        <SummaryItem
-          label="Stake or District"
-          value={
-            candidate?.ecclesiastical_area_name
-          }
+        <ComingSoonAction
+          title="Track Endorsements"
+          description="Monitor Church leader decisions"
         />
 
-        <SummaryItem
-          label="Ward or Branch"
-          value={candidate?.local_unit_name}
-        />
-
-        <SummaryItem
-          label="Progress"
-          value={`${application.completion_percentage}%`}
-        />
-
-        <SummaryItem
-          label="Status"
-          value={formatStatus(
-            application.status
-          )}
+        <ComingSoonAction
+          title="Manage Rooms"
+          description="Allocate student accommodation"
         />
       </div>
-
-      <Link
-        to={`/admin/applications/${application.id}`}
-        className="mt-6 block rounded-md bg-blue-900 px-5 py-3 text-center font-semibold text-white hover:bg-blue-800"
-      >
-        {application.status ===
-        'pending_ltc_review'
-          ? 'Review Application'
-          : 'View Application'}
-      </Link>
-
-      {application.status ===
-        'pending_local_endorsement' && (
-        <div className="mt-4 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-800">
-          LTC review completed. Church-unit
-          verification and local leader assignment
-          are next.
-        </div>
-      )}
-    </aside>
+    </section>
   );
 }
 
-function SummaryCard({
-  label,
-  value,
-  color,
+function QuickAction({
+  title,
+  description,
+  path,
+  primary = false,
 }) {
-  const colors = {
-    blue: 'border-blue-200 bg-blue-50 text-blue-900',
-    amber:
-      'border-amber-200 bg-amber-50 text-amber-800',
-    red: 'border-red-200 bg-red-50 text-red-700',
-    green:
-      'border-green-200 bg-green-50 text-green-700',
-  };
-
   return (
-    <article
-      className={`rounded-xl border p-5 ${
-        colors[color] || colors.blue
+    <Link
+      to={path}
+      className={`block rounded-lg border p-4 transition ${
+        primary
+          ? 'border-blue-900 bg-blue-900 text-white hover:bg-blue-800'
+          : 'border-slate-200 text-slate-800 hover:border-blue-300 hover:bg-blue-50'
       }`}
     >
-      <p className="text-sm font-medium">
-        {label}
+      <p className="font-semibold">
+        {title}
       </p>
 
-      <p className="mt-2 text-3xl font-bold">
-        {value}
+      <p
+        className={`mt-1 text-xs ${
+          primary
+            ? 'text-blue-100'
+            : 'text-slate-500'
+        }`}
+      >
+        {description}
       </p>
-    </article>
+    </Link>
   );
 }
 
-function SummaryItem({
-  label,
-  value,
+function ComingSoonAction({
+  title,
+  description,
 }) {
   return (
-    <div className="border-b border-slate-100 pb-3 last:border-0">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-        {label}
-      </p>
+    <div className="cursor-not-allowed rounded-lg border border-slate-200 bg-slate-50 p-4 text-slate-400">
+      <div className="flex justify-between gap-3">
+        <p className="font-semibold">
+          {title}
+        </p>
 
-      <p className="mt-1 text-sm font-medium text-slate-800">
-        {value || 'Not provided'}
+        <span className="text-[10px] font-bold uppercase">
+          Soon
+        </span>
+      </div>
+
+      <p className="mt-1 text-xs">
+        {description}
       </p>
     </div>
   );
 }
 
-function StatusBadge({ status }) {
+function SectionHeading({
+  title,
+  description,
+}) {
+  return (
+    <div>
+      <h2 className="text-xl font-bold text-blue-900">
+        {title}
+      </h2>
+
+      <p className="mt-1 text-sm text-slate-500">
+        {description}
+      </p>
+    </div>
+  );
+}
+
+function StatusBadge({
+  status,
+}) {
   const colors = {
     pending_ltc_review:
       'bg-amber-100 text-amber-800',
@@ -471,22 +509,28 @@ function StatusBadge({ status }) {
     pending_local_endorsement:
       'bg-blue-100 text-blue-800',
 
-    pending_area_endorsement:
+    pending_final_endorsement:
       'bg-purple-100 text-purple-800',
 
-    approved:
-      'bg-green-100 text-green-700',
+    admission_completed:
+      'bg-emerald-100 text-emerald-800',
 
-    admitted:
-      'bg-green-100 text-green-700',
+    awaiting_room:
+      'bg-cyan-100 text-cyan-800',
+
+    room_allocated:
+      'bg-green-100 text-green-800',
 
     rejected:
       'bg-red-100 text-red-700',
+
+    withdrawn:
+      'bg-slate-200 text-slate-700',
   };
 
   return (
     <span
-      className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${
+      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
         colors[status] ||
         'bg-slate-100 text-slate-700'
       }`}
@@ -496,34 +540,51 @@ function StatusBadge({ status }) {
   );
 }
 
-function formatStatus(status) {
-  if (!status) {
-    return '';
-  }
-
-  return status
-    .split('_')
-    .map(
-      (word) =>
-        word.charAt(0).toUpperCase() +
-        word.slice(1)
-    )
-    .join(' ');
-}
-
 function PageNotice({
   message,
   error = false,
 }) {
   return (
     <div
-      className={`p-8 text-center ${
+      role={error ? 'alert' : 'status'}
+      className={`rounded-xl border p-6 ${
         error
-          ? 'bg-red-50 text-red-700'
-          : 'text-slate-500'
+          ? 'border-red-200 bg-red-50 text-red-700'
+          : 'border-blue-200 bg-blue-50 text-blue-900'
       }`}
     >
       {message}
     </div>
   );
+}
+
+function formatStatus(status) {
+  if (!status) {
+    return 'Unknown';
+  }
+
+  return status
+    .replaceAll('_', ' ')
+    .replace(/\b\w/g, (letter) =>
+      letter.toUpperCase()
+    );
+}
+
+function formatDate(value) {
+  if (!value) {
+    return 'Not submitted';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Not available';
+  }
+
+  return new Intl.DateTimeFormat(
+    'en-NG',
+    {
+      dateStyle: 'medium',
+    }
+  ).format(date);
 }

@@ -51,12 +51,12 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-900 font-bold text-white">
-              LA
+              LTC
             </div>
 
             <div>
               <p className="font-serif text-xl font-bold text-blue-900">
-                LightApp
+                Zion-LightApp
               </p>
 
               <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">
@@ -222,7 +222,7 @@ export default function LandingPage() {
               to="/signup"
               className="block w-full rounded-md border border-blue-800 px-4 py-3 text-center font-semibold text-blue-900"
             >
-              Register as New Student
+              Get Started with a New Application
             </Link>
           </form>
         </section>
@@ -231,7 +231,7 @@ export default function LandingPage() {
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
           <p>
-            © 2026 LightApp Admissions. All rights reserved.
+            © 2026 Zion-LightApp Admissions. All rights reserved.
           </p>
 
           <div className="flex gap-6">

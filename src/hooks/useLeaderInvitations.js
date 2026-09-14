@@ -6,6 +6,7 @@ import {
 
 import {
   createAreaLeaderInvitation,
+  getActiveInvitationAreas,
   getAreaLeaderInvitations,
 } from '../services/invitationService';
 
@@ -13,25 +14,23 @@ export function useAreaLeaderInvitations() {
   const queryClient = useQueryClient();
 
   const invitationsQuery = useQuery({
-    queryKey: [
-      'area-leader-invitations',
-    ],
-
-    queryFn:
-      getAreaLeaderInvitations,
-
+    queryKey: ['area-leader-invitations'],
+    queryFn: getAreaLeaderInvitations,
     staleTime: 30 * 1000,
   });
 
+  const areasQuery = useQuery({
+    queryKey: ['active-invitation-areas'],
+    queryFn: getActiveInvitationAreas,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const createMutation = useMutation({
-    mutationFn:
-      createAreaLeaderInvitation,
+    mutationFn: createAreaLeaderInvitation,
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: [
-          'area-leader-invitations',
-        ],
+        queryKey: ['area-leader-invitations'],
       });
     },
 
@@ -46,13 +45,12 @@ export function useAreaLeaderInvitations() {
   return {
     ...invitationsQuery,
 
-    createInvitation:
-      createMutation.mutateAsync,
+    areas: areasQuery.data || [],
+    areasLoading: areasQuery.isLoading,
+    areasError: areasQuery.error,
 
-    creatingInvitation:
-      createMutation.isPending,
-
-    creationError:
-      createMutation.error,
+    createInvitation: createMutation.mutateAsync,
+    creatingInvitation: createMutation.isPending,
+    creationError: createMutation.error,
   };
 }

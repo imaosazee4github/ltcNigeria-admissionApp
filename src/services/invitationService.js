@@ -1,5 +1,29 @@
 import { supabase } from '../utils/supabase';
 
+export async function getActiveInvitationAreas() {
+  const { data, error } = await supabase
+    .from('ecclesiastical_areas')
+    .select(`
+      id,
+      name,
+      area_type,
+      state
+    `)
+    .eq('status', 'active')
+    .in('area_type', [
+      'stake',
+      'district',
+    ])
+    .order('state')
+    .order('name');
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data || [];
+}
+
 export async function getAreaLeaderInvitations() {
   const { data, error } = await supabase
     .from('leader_invitations')
@@ -16,7 +40,8 @@ export async function getAreaLeaderInvitations() {
       ecclesiastical_areas (
         id,
         name,
-        area_type
+        area_type,
+        state
       )
     `)
     .in('intended_role', [

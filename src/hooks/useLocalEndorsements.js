@@ -17,8 +17,7 @@ export function useLocalEndorsementQueue() {
   return useQuery({
     queryKey: localEndorsementQueueKey,
 
-    queryFn:
-      getLocalEndorsementQueue,
+    queryFn: getLocalEndorsementQueue,
 
     staleTime: 30 * 1000,
   });
@@ -33,11 +32,13 @@ export function useSubmitLocalEndorsement(
     mutationFn: ({
       decision,
       comments,
+      responses,
     }) =>
       submitLocalEndorsement({
         applicationId,
         decision,
         comments,
+        responses,
       }),
 
     onSuccess: async () => {

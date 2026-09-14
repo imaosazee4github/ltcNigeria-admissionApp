@@ -6,6 +6,7 @@ import {
 
 import {
   createLocalLeaderInvitation,
+  getActiveLocalUnits,
   getMyLeaderAssignment,
   getMyLocalLeaderInvitations,
 } from '../services/localLeaderInvitationService';
@@ -26,7 +27,7 @@ export function useLeaderAssignment(profileId) {
   });
 }
 
-export function useLocalLeaderInvitations() {
+export function useLocalLeaderInvitations(areaId) {
   const queryClient = useQueryClient();
 
   const invitationsQuery = useQuery({
@@ -34,13 +35,29 @@ export function useLocalLeaderInvitations() {
       'local-leader-invitations',
     ],
 
-    queryFn: getMyLocalLeaderInvitations,
+    queryFn:
+      getMyLocalLeaderInvitations,
 
     staleTime: 30 * 1000,
   });
 
+  const localUnitsQuery = useQuery({
+    queryKey: [
+      'active-local-units',
+      areaId,
+    ],
+
+    queryFn: () =>
+      getActiveLocalUnits(areaId),
+
+    enabled: Boolean(areaId),
+
+    staleTime: 5 * 60 * 1000,
+  });
+
   const createMutation = useMutation({
-    mutationFn: createLocalLeaderInvitation,
+    mutationFn:
+      createLocalLeaderInvitation,
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -60,6 +77,15 @@ export function useLocalLeaderInvitations() {
 
   return {
     ...invitationsQuery,
+
+    localUnits:
+      localUnitsQuery.data || [],
+
+    localUnitsLoading:
+      localUnitsQuery.isLoading,
+
+    localUnitsError:
+      localUnitsQuery.error,
 
     createInvitation:
       createMutation.mutateAsync,
