@@ -120,7 +120,7 @@ export default function PresidentDashboard() {
               to="/president/leader-invitations"
               className="w-fit rounded-lg bg-blue-900 px-5 py-3 font-semibold text-white transition hover:bg-blue-800"
             >
-              Invite Local Leader
+              Invite Unit Leader
             </Link>
           </header>
 
@@ -230,7 +230,7 @@ export default function PresidentDashboard() {
             <article className="rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="border-b border-slate-200 p-6">
                 <h2 className="text-xl font-bold text-blue-900">
-                  Final Endorsements
+                  Stake President Endorsements
                 </h2>
 
                 <p className="mt-1 text-sm text-slate-600">

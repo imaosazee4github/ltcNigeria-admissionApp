@@ -1,22 +1,32 @@
 import { Route, Routes } from "react-router-dom";
 
-import PresidentDashboard from "../pages/leaders/PresidentDashboard";
-
-import LocalLeaderDashboard from "../pages/leaders/LocalLeaderDashboard";
 import LandingPage from "../pages/LandingPage";
+import PlaceholderDashboard from "../pages/PlaceholderDashboard";
+
+import AdmittedStudentsPage from "../pages/admin/AdmittedStudentsPage";
+import AdminRoomsPage from "../pages/admin/AdminRoomsPage";
+import AdminEndorsementsPage from "../pages/admin/AdminEndorsementsPage";
+import AdminApplicationsPage from "../pages/admin/AdminApplicationsPage";
+import LocalEndorsementsPage from "../pages/leaders/LocalEndorsementsPage";
 import SignUpPage from "../pages/auth/SignUpPage";
 import AuthRedirectPage from "../pages/auth/AuthRedirectPage";
-import LeaderInvitationsPage from "../pages/admin/LeaderInvitationsPage";
-
-import LocalLeaderInvitationsPage from "../pages/leaders/LocalLeaderInvitationsPage";
 import InvitationRegistrationPage from "../pages/auth/InvitationRegistrationPage";
+
 import CandidateDashboard from "../pages/candidate/CandidateDashboard";
 import ApplicationPage from "../pages/candidate/ApplicationPage";
+import CandidateProfilePage from "../pages/candidate/CandidateProfilePage";
+
+import PresidentDashboard from "../pages/leaders/PresidentDashboard";
+import LocalLeaderDashboard from "../pages/leaders/LocalLeaderDashboard";
+import LocalLeaderInvitationsPage from "../pages/leaders/LocalLeaderInvitationsPage";
+import LocalEndorsementReviewPage from "../pages/leaders/LocalEndorsementReviewPage";
+import FinalEndorsementsPage from "../pages/leaders/FinalEndorsementsPage";
+import FinalEndorsementReviewPage from "../pages/leaders/FinalEndorsementReviewPage";
+import LeaderCandidatesPage from "../pages/leaders/LeaderCandidatesPage";
 
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import ApplicationReviewPage from "../pages/admin/ApplicationReviewPage";
-
-import PlaceholderDashboard from "../pages/PlaceholderDashboard";
+import LeaderInvitationsPage from "../pages/admin/LeaderInvitationsPage";
 
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import RoleRoute from "../components/common/RoleRoute";
@@ -34,7 +44,6 @@ export default function AppRoutes() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<LandingPage />} />
-
       <Route path="/signup" element={<SignUpPage />} />
 
       <Route
@@ -63,8 +72,25 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Bishop route */}
+      <Route
+        path="/admin/endorsements"
+        element={
+          <SecureRolePage roles={["ltc_admin", "super_admin"]}>
+            <AdminEndorsementsPage />
+          </SecureRolePage>
+        }
+      />
 
+      <Route
+        path="/candidate/profile"
+        element={
+          <SecureRolePage roles={["candidate"]}>
+            <CandidateProfilePage />
+          </SecureRolePage>
+        }
+      />
+
+      {/* Local leader routes */}
       <Route
         path="/bishop/dashboard"
         element={
@@ -74,16 +100,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Branch President route */}
-      {/* <Route
-        path="/branch-president/dashboard"
-        element={
-          <SecureRolePage roles={["branch_president"]}>
-            <PlaceholderDashboard title="Branch President Dashboard" />
-          </SecureRolePage>
-        }
-      /> */}
-
       <Route
         path="/branch-president/dashboard"
         element={
@@ -93,8 +109,34 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Stake President route */}
+      <Route
+        path="/leader/endorsements"
+        element={
+          <SecureRolePage roles={["bishop", "branch_president"]}>
+            <LocalEndorsementsPage />
+          </SecureRolePage>
+        }
+      />
 
+      <Route
+        path="/leader/endorsements/:applicationId"
+        element={
+          <SecureRolePage roles={["bishop", "branch_president"]}>
+            <LocalEndorsementReviewPage />
+          </SecureRolePage>
+        }
+      />
+
+      <Route
+        path="/leader/candidates"
+        element={
+          <SecureRolePage roles={["bishop", "branch_president"]}>
+            <LeaderCandidatesPage />
+          </SecureRolePage>
+        }
+      />
+
+      {/* Area president routes */}
       <Route
         path="/stake-president/dashboard"
         element={
@@ -103,8 +145,6 @@ export default function AppRoutes() {
           </SecureRolePage>
         }
       />
-
-      {/* District President route */}
 
       <Route
         path="/district-president/dashboard"
@@ -124,7 +164,34 @@ export default function AppRoutes() {
         }
       />
 
-      {/* LTC Admin dashboard */}
+      <Route
+        path="/president/endorsements"
+        element={
+          <SecureRolePage roles={["stake_president", "district_president"]}>
+            <FinalEndorsementsPage />
+          </SecureRolePage>
+        }
+      />
+
+      <Route
+        path="/president/endorsements/:applicationId"
+        element={
+          <SecureRolePage roles={["stake_president", "district_president"]}>
+            <FinalEndorsementReviewPage />
+          </SecureRolePage>
+        }
+      />
+
+      <Route
+        path="/president/candidates"
+        element={
+          <SecureRolePage roles={["stake_president", "district_president"]}>
+            <LeaderCandidatesPage />
+          </SecureRolePage>
+        }
+      />
+
+      {/* LTC Admin routes */}
       <Route
         path="/admin/dashboard"
         element={
@@ -134,7 +201,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* LTC Admin application review */}
       <Route
         path="/admin/applications/:applicationId"
         element={
@@ -154,15 +220,32 @@ export default function AppRoutes() {
       />
 
       <Route
-        path="/president/leader-invitations"
+        path="/admin/applications"
         element={
-          <SecureRolePage roles={["stake_president", "district_president"]}>
-            <LocalLeaderInvitationsPage />
+          <SecureRolePage roles={["ltc_admin", "super_admin"]}>
+            <AdminApplicationsPage />
           </SecureRolePage>
         }
       />
 
-      {/* Super Admin dashboard */}
+      <Route
+        path="/admin/students"
+        element={
+          <SecureRolePage roles={["ltc_admin", "super_admin"]}>
+            <AdmittedStudentsPage />
+          </SecureRolePage>
+        }
+      />
+      <Route
+        path="/admin/rooms"
+        element={
+          <SecureRolePage roles={["ltc_admin", "super_admin"]}>
+            <AdminRoomsPage />
+          </SecureRolePage>
+        }
+      />
+
+      {/* Super Admin */}
       <Route
         path="/super-admin/dashboard"
         element={
@@ -188,7 +271,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* 404 */}
+      {/* Not found */}
       <Route
         path="*"
         element={

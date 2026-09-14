@@ -1,129 +1,74 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from "../../hooks/useAuth";
+import LeaderLayout from "../../layouts/LeaderLayout";
 
-import {
-  useLocalEndorsementQueue,
-} from '../../hooks/useLocalEndorsements';
+import { useLocalEndorsementQueue } from "../../hooks/useLocalEndorsements";
 
 export default function LocalLeaderDashboard() {
   const navigate = useNavigate();
 
-  const {
-    profile,
-    signOut,
-  } = useAuth();
+  const { profile } = useAuth();
 
-  const {
-    data,
-    isLoading,
-    error,
-    refetch,
-    isFetching,
-  } = useLocalEndorsementQueue();
-
-  async function handleSignOut() {
-    const result = await signOut();
-
-    if (result?.error) {
-      console.error(
-        result.error.message
-      );
-
-      return;
-    }
-
-    navigate('/', {
-      replace: true,
-    });
-  }
+  const { data, isLoading, error, refetch, isFetching } =
+    useLocalEndorsementQueue();
 
   if (isLoading) {
     return (
-      <PageMessage message="Loading endorsement queue..." />
+      <LeaderLayout>
+        <PageMessage message="Loading endorsement queue..." />
+      </LeaderLayout>
     );
   }
 
   if (error) {
     return (
-      <PageMessage
-        error
-        message={error.message}
-      />
+      <LeaderLayout>
+        <PageMessage error message={error.message} />
+      </LeaderLayout>
     );
   }
 
-  const applications =
-    data?.applications || [];
+  const applications = data?.applications || [];
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-5 p-6 md:flex-row md:items-center md:px-8">
-          <div>
+    <LeaderLayout>
+      <main className="min-h-screen bg-slate-50 p-6 md:p-8">
+        <div className="mx-auto max-w-7xl">
+          <header>
             <p className="text-sm font-semibold uppercase tracking-wider text-amber-600">
-              Church Leadership
+              Unit Leader
             </p>
 
             <h1 className="mt-2 text-3xl font-bold text-blue-900">
-              {getDashboardTitle(
-                data?.leaderRole
-              )}
+              {getDashboardTitle(data?.leaderRole)}
             </h1>
 
             <p className="mt-2 text-slate-600">
-              Welcome,{' '}
-              {profile?.full_name ||
-                'Church Leader'}
+              Welcome, {profile?.full_name || "Church Leader"}
             </p>
-          </div>
+          </header>
 
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="w-fit rounded-md border border-blue-900 px-5 py-3 font-semibold text-blue-900 transition hover:bg-blue-50"
-          >
-            Sign Out
-          </button>
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-7xl p-6 md:p-8">
-        <section className="rounded-xl border border-blue-200 bg-blue-50 p-6">
+        <section className="mt-8 rounded-xl border border-blue-200 bg-blue-50 p-6">
           <p className="text-sm font-semibold uppercase tracking-wider text-blue-700">
-            Assigned Local Unit
+            Assigned  Unit
           </p>
 
           <h2 className="mt-2 text-2xl font-bold text-blue-900">
-            {data?.localUnitName ||
-              'Unit not assigned'}
+            {data?.localUnitName || "Unit not assigned"}
           </h2>
 
           <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-700">
             <p>
-              Unit type:{' '}
-              <strong>
-                {formatValue(
-                  data?.localUnitType
-                )}
-              </strong>
+              Unit type: <strong>{formatValue(data?.localUnitType)}</strong>
             </p>
 
             <p>
-              Area:{' '}
-              <strong>
-                {data?.areaName ||
-                  'Not available'}
-              </strong>
+              Stake: <strong>{data?.areaName || "Not available"}</strong>
             </p>
 
             <p>
-              Calling:{' '}
-              <strong>
-                {formatValue(
-                  data?.leaderRole
-                )}
-              </strong>
+              Calling: <strong>{formatValue(data?.leaderRole)}</strong>
             </p>
           </div>
         </section>
@@ -139,25 +84,19 @@ export default function LocalLeaderDashboard() {
           <SummaryCard
             label="Assigned Unit"
             value={
-              data?.localUnitType === 'ward'
-                ? 'Ward'
-                : data?.localUnitType ===
-                    'branch'
-                  ? 'Branch'
-                  : 'Unknown'
+              data?.localUnitType === "ward"
+                ? "Ward"
+                : data?.localUnitType === "branch"
+                  ? "Branch"
+                  : "Unknown"
             }
-            description={
-              data?.localUnitName ||
-              'No local unit assigned'
-            }
+            description={data?.localUnitName || "No local unit assigned"}
             colour="blue"
           />
 
           <SummaryCard
             label="Leader Role"
-            value={formatValue(
-              data?.leaderRole
-            )}
+            value={formatValue(data?.leaderRole)}
             description="Your active endorsement responsibility"
             colour="green"
           />
@@ -171,8 +110,7 @@ export default function LocalLeaderDashboard() {
               </h2>
 
               <p className="mt-1 text-sm text-slate-600">
-                Review candidates from your
-                assigned ward or branch.
+                Review candidates from your assigned ward or branch.
               </p>
             </div>
 
@@ -182,9 +120,7 @@ export default function LocalLeaderDashboard() {
               disabled={isFetching}
               className="w-fit rounded-md border border-blue-900 px-4 py-2 text-sm font-semibold text-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isFetching
-                ? 'Refreshing...'
-                : 'Refresh Queue'}
+              {isFetching ? "Refreshing..." : "Refresh Queue"}
             </button>
           </div>
 
@@ -195,41 +131,37 @@ export default function LocalLeaderDashboard() {
               </h3>
 
               <p className="mt-2 text-sm text-slate-600">
-                There are currently no
-                LTC-approved applications assigned
-                to your ward or branch.
+                There are currently no LTC-approved applications assigned to
+                your ward or branch.
               </p>
             </div>
           ) : (
             <div className="divide-y divide-slate-200">
-              {applications.map(
-                (application) => (
-                  <CandidateQueueItem
-                    key={application.id}
-                    application={
-                      application
-                    }
-                  />
-                )
-              )}
+              {applications.map((application) => (
+                <CandidateQueueItem
+                  key={application.id}
+                  application={application}
+                  onReview={() =>
+                    navigate(`/leader/endorsements/${application.id}`)
+                  }
+                />
+              ))}
             </div>
           )}
         </section>
-      </div>
-    </main>
+        </div>
+      </main>
+    </LeaderLayout>
   );
 }
 
-function CandidateQueueItem({
-  application,
-}) {
+function CandidateQueueItem({ application, onReview }) {
   return (
     <article className="flex flex-col justify-between gap-5 p-6 lg:flex-row lg:items-center">
       <div>
         <div className="flex flex-wrap items-center gap-3">
           <h3 className="text-lg font-bold text-slate-900">
-            {application.candidate_name ||
-              'Unknown candidate'}
+            {application.candidate_name || "Unknown candidate"}
           </h3>
 
           <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
@@ -239,53 +171,44 @@ function CandidateQueueItem({
 
         <div className="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2 lg:grid-cols-3">
           <p>
-            Application:{' '}
+            Application:{" "}
             <strong className="text-slate-800">
-              {application.application_number ||
-                'Not assigned'}
+              {application.application_number || "Not assigned"}
             </strong>
           </p>
 
           <p>
-            Intake:{' '}
+            Intake:{" "}
             <strong className="text-slate-800">
-              {application.intake_name ||
-                'Not available'}
+              {application.intake_name || "Not available"}
             </strong>
           </p>
 
           <p>
-            Submitted:{' '}
+            Submitted:{" "}
             <strong className="text-slate-800">
-              {formatDate(
-                application.submitted_at
-              )}
+              {formatDate(application.submitted_at)}
             </strong>
           </p>
 
           <p>
-            Email:{' '}
+            Email:{" "}
             <strong className="text-slate-800">
-              {application.candidate_email ||
-                'Not available'}
+              {application.candidate_email || "Not available"}
             </strong>
           </p>
 
           <p>
-            Phone:{' '}
+            Phone:{" "}
             <strong className="text-slate-800">
-              {application.candidate_phone ||
-                'Not available'}
+              {application.candidate_phone || "Not available"}
             </strong>
           </p>
 
           <p>
-            Membership number:{' '}
+            Membership number:{" "}
             <strong className="text-slate-800">
-              {
-                application.membership_record_number ||
-                'Not provided'
-              }
+              {application.membership_record_number || "Not provided"}
             </strong>
           </p>
         </div>
@@ -293,9 +216,8 @@ function CandidateQueueItem({
 
       <button
         type="button"
-        disabled
-        title="The review page is added in the next step"
-        className="w-fit cursor-not-allowed rounded-md bg-blue-300 px-5 py-3 font-semibold text-white"
+        onClick={onReview}
+        className="w-fit rounded-md bg-blue-900 px-5 py-3 font-semibold text-white transition hover:bg-blue-800"
       >
         Review Candidate
       </button>
@@ -303,26 +225,16 @@ function CandidateQueueItem({
   );
 }
 
-function SummaryCard({
-  label,
-  value,
-  description,
-  colour,
-}) {
+function SummaryCard({ label, value, description, colour }) {
   const colours = {
-    amber:
-      'bg-amber-100 text-amber-800',
-    blue:
-      'bg-blue-100 text-blue-800',
-    green:
-      'bg-green-100 text-green-800',
+    amber: "bg-amber-100 text-amber-800",
+    blue: "bg-blue-100 text-blue-800",
+    green: "bg-green-100 text-green-800",
   };
 
   return (
     <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-sm font-medium text-slate-500">
-        {label}
-      </p>
+      <p className="text-sm font-medium text-slate-500">{label}</p>
 
       <p
         className={`mt-3 inline-flex rounded-lg px-3 py-1 text-2xl font-bold ${
@@ -332,24 +244,19 @@ function SummaryCard({
         {value}
       </p>
 
-      <p className="mt-3 text-sm text-slate-600">
-        {description}
-      </p>
+      <p className="mt-3 text-sm text-slate-600">{description}</p>
     </article>
   );
 }
 
-function PageMessage({
-  message,
-  error = false,
-}) {
+function PageMessage({ message, error = false }) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
       <div
         className={
           error
-            ? 'rounded-lg border border-red-200 bg-red-50 p-5 text-red-700'
-            : 'rounded-lg bg-white p-5 text-slate-600 shadow'
+            ? "rounded-lg border border-red-200 bg-red-50 p-5 text-red-700"
+            : "rounded-lg bg-white p-5 text-slate-600 shadow"
         }
       >
         {message}
@@ -359,42 +266,35 @@ function PageMessage({
 }
 
 function getDashboardTitle(role) {
-  if (role === 'bishop') {
-    return 'Bishop Dashboard';
+  if (role === "bishop") {
+    return "Bishop Dashboard";
   }
 
-  if (role === 'branch_president') {
-    return 'Branch President Dashboard';
+  if (role === "branch_president") {
+    return "Branch President Dashboard";
   }
 
-  return 'Local Leader Dashboard';
+  return "Local Leader Dashboard";
 }
 
 function formatValue(value) {
   if (!value) {
-    return 'Not available';
+    return "Not available";
   }
 
   return String(value)
-    .split('_')
-    .map(
-      (word) =>
-        word.charAt(0).toUpperCase() +
-        word.slice(1)
-    )
-    .join(' ');
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 function formatDate(value) {
   if (!value) {
-    return 'Not available';
+    return "Not available";
   }
 
-  return new Intl.DateTimeFormat(
-    'en-NG',
-    {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }
-  ).format(new Date(value));
+  return new Intl.DateTimeFormat("en-NG", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
 }

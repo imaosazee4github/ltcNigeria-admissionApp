@@ -8,12 +8,19 @@ export default function LeaderLayout({
   children,
 }) {
   const navigate = useNavigate();
-  const { profile, signOut } = useAuth();
+
+  const {
+  profile,
+  role,
+  signOut,
+} = useAuth();
+//   const { profile, signOut } = useAuth();
 
   const [sidebarOpen, setSidebarOpen] =
     useState(false);
 
-  const leaderRole = profile?.role;
+//   const leaderRole = profile?.role;
+  const leaderRole = role;
 
   async function handleSignOut() {
     const result = await signOut();

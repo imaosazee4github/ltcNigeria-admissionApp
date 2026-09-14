@@ -183,47 +183,70 @@ export async function getLatestApplicationReview(
   return data;
 }
 
-// export async function initializeCandidateApplication(profileId) {
-//   const intake = await getOpenIntake();
 
-//   if (!intake) {
-//     return {
-//       intake: null,
-//       candidateProfile: null,
-//       application: null,
-//     };
-//   }
+export async function getCandidateRoomAssignment() {
+  const { data, error } = await supabase.rpc(
+    'get_candidate_room_assignment'
+  );
 
-//   const candidateProfile = await getOrCreateCandidateProfile(profileId);
+  if (error) {
+    throw new Error(error.message);
+  }
 
-//   const application = await getOrCreateApplication(
-//     candidateProfile.id,
-//     intake.id,
-//   );
+  return {
+    application:
+      data?.application || null,
 
-//   return {
-//     intake,
-//     candidateProfile,
-//     application,
-//   };
-// }
+    roomStatus:
+      data?.room_status ||
+      'not_available',
+
+    assignment:
+      data?.assignment || null,
+  };
+}
 
 export async function initializeCandidateApplication(
   profileId
 ) {
-  const intake = await getOpenIntake();
+  if (!profileId) {
+    throw new Error(
+      'The profile ID is required.'
+    );
+  }
 
+  const [
+    intake,
+    roomAssignment,
+  ] = await Promise.all([
+    getOpenIntake(),
+    getCandidateRoomAssignment(),
+  ]);
+
+  /*
+   * Room information is independent of
+   * whether an intake is currently open.
+   *
+   * This allows admitted candidates to
+   * continue seeing their assigned room
+   * after applications have closed.
+   */
   if (!intake) {
     return {
       intake: null,
       candidateProfile: null,
-      application: null,
+      application:
+        roomAssignment?.application ||
+        null,
       latestReview: null,
+      roomAssignment,
     };
   }
 
   const candidateProfile =
-    await getOrCreateCandidateProfile(profileId);
+    await getOrCreateCandidateProfile(
+      profileId
+    );
 
   const application =
     await getOrCreateApplication(
@@ -245,8 +268,49 @@ export async function initializeCandidateApplication(
     candidateProfile,
     application,
     latestReview,
+    roomAssignment,
   };
 }
+
+// export async function initializeCandidateApplication(
+//   profileId
+// ) {
+//   const intake = await getOpenIntake();
+
+//   if (!intake) {
+//     return {
+//       intake: null,
+//       candidateProfile: null,
+//       application: null,
+//       latestReview: null,
+//     };
+//   }
+
+//   const candidateProfile =
+//     await getOrCreateCandidateProfile(profileId);
+
+//   const application =
+//     await getOrCreateApplication(
+//       candidateProfile.id,
+//       intake.id
+//     );
+
+//   let latestReview = null;
+
+//   if (application) {
+//     latestReview =
+//       await getLatestApplicationReview(
+//         application.id
+//       );
+//   }
+
+//   return {
+//     intake,
+//     candidateProfile,
+//     application,
+//     latestReview,
+//   };
+// }
 
 
 // NEW: Resubmits an application after corrections
@@ -317,6 +381,108 @@ export async function submitApplication({
       accept_privacy: acceptPrivacy,
     }
   );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function getCandidateProfileDetails(
+  profileId
+) {
+  if (!profileId) {
+    throw new Error(
+      'The profile ID is required.'
+    );
+  }
+
+  const { data, error } = await supabase
+    .from('candidate_profiles')
+    .select(`
+      id,
+      profile_id,
+      mission_name,
+      mission_country,
+      mission_start_date,
+      mission_end_date,
+      missionary_status,
+      ecclesiastical_area_type,
+      ecclesiastical_area_name,
+      local_unit_type,
+      local_unit_name,
+      membership_record_number
+    `)
+    .eq('profile_id', profileId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function updateAccountProfile({
+  profileId,
+  fullName,
+  phone,
+}) {
+  if (!profileId) {
+    throw new Error(
+      'The profile ID is required.'
+    );
+  }
+
+  if (!fullName?.trim()) {
+    throw new Error(
+      'Enter your full name.'
+    );
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      full_name: fullName.trim(),
+      phone: phone?.trim() || null,
+    })
+    .eq('id', profileId)
+    .select(`
+      id,
+      full_name,
+      email,
+      phone,
+      account_status
+    `)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function changeAccountPassword(
+  newPassword
+) {
+  if (!newPassword) {
+    throw new Error(
+      'Enter your new password.'
+    );
+  }
+
+  if (newPassword.length < 8) {
+    throw new Error(
+      'Your password must contain at least 8 characters.'
+    );
+  }
+
+  const { data, error } =
+    await supabase.auth.updateUser({
+      password: newPassword,
+    });
 
   if (error) {
     throw new Error(error.message);

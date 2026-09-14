@@ -457,47 +457,6 @@ export default function ApplicationReviewPage() {
               )}
             </section>
 
-            {/* <section className="rounded-xl border border-blue-200 bg-blue-50 p-6">
-              <h2 className="text-lg font-bold text-blue-900">
-                LTC Admin Review
-              </h2>
-
-              <p className="mt-3 text-sm leading-6 text-blue-900">
-                Check the candidate’s information and uploaded
-                documents before making a decision.
-              </p>
-
-              <div className="mt-5 space-y-3">
-                <button
-                  type="button"
-                  disabled
-                  className="w-full rounded-md bg-blue-900 px-4 py-3 font-semibold text-white opacity-60"
-                >
-                  Approve Application
-                </button>
-
-                <button
-                  type="button"
-                  disabled
-                  className="w-full rounded-md border border-amber-500 px-4 py-3 font-semibold text-amber-700 opacity-60"
-                >
-                  Request Correction
-                </button>
-
-                <button
-                  type="button"
-                  disabled
-                  className="w-full rounded-md border border-red-500 px-4 py-3 font-semibold text-red-700 opacity-60"
-                >
-                  Reject Application
-                </button>
-              </div>
-
-              <p className="mt-4 text-xs text-slate-600">
-                Decision buttons will be activated after the
-                secure review function is added.
-              </p>
-            </section> */}
           </aside>
         </div>
       </div>

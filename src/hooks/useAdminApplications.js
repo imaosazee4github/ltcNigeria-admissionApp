@@ -7,19 +7,48 @@ import {
 import {
   getAdminApplication,
   getAdminApplicationQueue,
+  getAdminDashboardSummary,
   reviewApplication,
 } from '../services/adminApplicationService';
 
-export function useAdminApplicationQueue() {
+export const adminDashboardKey = [
+  'admin-dashboard-summary',
+];
+
+export const adminApplicationQueueKey = [
+  'admin-application-queue',
+];
+
+export function useAdminDashboardSummary() {
   return useQuery({
-    queryKey: ['admin-application-queue'],
-    queryFn: getAdminApplicationQueue,
-    staleTime: 30 * 1000,
+    queryKey: adminDashboardKey,
+
+    queryFn:
+      getAdminDashboardSummary,
+
+    staleTime:
+      30 * 1000,
   });
 }
 
-export function useAdminApplication(applicationId) {
-  const queryClient = useQueryClient();
+export function useAdminApplicationQueue() {
+  return useQuery({
+    queryKey:
+      adminApplicationQueueKey,
+
+    queryFn:
+      getAdminApplicationQueue,
+
+    staleTime:
+      30 * 1000,
+  });
+}
+
+export function useAdminApplication(
+  applicationId
+) {
+  const queryClient =
+    useQueryClient();
 
   const applicationQuery = useQuery({
     queryKey: [
@@ -28,27 +57,40 @@ export function useAdminApplication(applicationId) {
     ],
 
     queryFn: () =>
-      getAdminApplication(applicationId),
+      getAdminApplication(
+        applicationId
+      ),
 
-    enabled: Boolean(applicationId),
+    enabled:
+      Boolean(applicationId),
 
-    staleTime: 30 * 1000,
+    staleTime:
+      30 * 1000,
   });
 
   const reviewMutation = useMutation({
     mutationFn: ({
       decision,
       comments,
-    }) => {
-      return reviewApplication({
+    }) =>
+      reviewApplication({
         applicationId,
         decision,
         comments,
-      });
-    },
+      }),
 
     onSuccess: async () => {
       await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey:
+            adminDashboardKey,
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey:
+            adminApplicationQueueKey,
+        }),
+
         queryClient.invalidateQueries({
           queryKey: [
             'admin-application',
@@ -58,7 +100,7 @@ export function useAdminApplication(applicationId) {
 
         queryClient.invalidateQueries({
           queryKey: [
-            'admin-application-queue',
+            'candidate-application',
           ],
         }),
       ]);
