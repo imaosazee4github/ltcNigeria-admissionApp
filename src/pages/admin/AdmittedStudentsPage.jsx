@@ -1,134 +1,88 @@
-import {
-  useMemo,
-  useState,
-} from 'react';
+import { useMemo, useState } from "react";
 
-
-import AssignRoomModal from '../../components/admin/AssignRoomModal';
+import AssignRoomModal from "../../components/admin/AssignRoomModal";
+import ReleaseRoomModal from "../../components/admin/ReleaseRoomModal";
 
 import {
   useAdminStudents,
   useAutoAssignCandidateRoom,
-} from '../../hooks/useAdminStudents';
-import AdminLayout from '../../layouts/AdminLayout';
+} from "../../hooks/useAdminStudents";
+import AdminLayout from "../../layouts/AdminLayout";
 
 export default function AdmittedStudentsPage() {
-  const [search, setSearch] =
-    useState('');
+  const [search, setSearch] = useState("");
 
-  const [statusFilter, setStatusFilter] =
-    useState('all');
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  const [selectedStudent, setSelectedStudent] =
-    useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
-  const [autoAssigningId, setAutoAssigningId] =
-    useState(null);
+  const [studentToRelease, setStudentToRelease] = useState(null);
 
-  const [notice, setNotice] =
-    useState(null);
+  const [autoAssigningId, setAutoAssigningId] = useState(null);
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    refetch,
-    isFetching,
-  } = useAdminStudents();
+  const [notice, setNotice] = useState(null);
 
-  const {
-    autoAssignRoom,
-    autoAssigning,
-  } = useAutoAssignCandidateRoom();
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    useAdminStudents();
 
-  const students =
-    data?.students || [];
+  const { autoAssignRoom, autoAssigning } = useAutoAssignCandidateRoom();
 
-  const summary =
-    data?.summary || {};
+  const students = data?.students || [];
 
-  const filteredStudents =
-    useMemo(() => {
-      const normalizedSearch =
-        search.trim().toLowerCase();
+  const summary = data?.summary || {};
 
-      return students.filter(
-        (student) => {
-          const matchesSearch =
-            !normalizedSearch ||
-            [
-              student.candidate_name,
-              student.candidate_email,
-              student.application_number,
-              student.local_unit_name,
-              student.area_name,
-              student.intake_name,
-            ]
-              .filter(Boolean)
-              .some((value) =>
-                String(value)
-                  .toLowerCase()
-                  .includes(
-                    normalizedSearch
-                  )
-              );
+  const filteredStudents = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
 
-          const matchesStatus =
-            statusFilter === 'all' ||
-            student.room_status ===
-              statusFilter;
-
-          return (
-            matchesSearch &&
-            matchesStatus
+    return students.filter((student) => {
+      const matchesSearch =
+        !normalizedSearch ||
+        [
+          student.candidate_name,
+          student.candidate_email,
+          student.application_number,
+          student.local_unit_name,
+          student.area_name,
+          student.intake_name,
+        ]
+          .filter(Boolean)
+          .some((value) =>
+            String(value).toLowerCase().includes(normalizedSearch),
           );
-        }
-      );
-    }, [
-      students,
-      search,
-      statusFilter,
-    ]);
 
-  async function handleAutoAssign(
-    student
-  ) {
+      const matchesStatus =
+        statusFilter === "all" || student.room_status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [students, search, statusFilter]);
+
+  async function handleAutoAssign(student) {
     setNotice(null);
 
-    const confirmed =
-      window.confirm(
-        `Automatically assign an available bed to ${student.candidate_name}?`
-      );
+    const confirmed = window.confirm(
+      `Automatically assign an available bed to ${student.candidate_name}?`,
+    );
 
     if (!confirmed) return;
 
-    setAutoAssigningId(
-      student.application_id
-    );
+    setAutoAssigningId(student.application_id);
 
     try {
-      const result =
-        await autoAssignRoom({
-          applicationId:
-            student.application_id,
-        });
+      const result = await autoAssignRoom({
+        applicationId: student.application_id,
+      });
 
       setNotice({
-        type: result?.allocated
-          ? 'success'
-          : 'warning',
+        type: result?.allocated ? "success" : "warning",
 
-        message:
-          result?.message ||
-          'Room allocation completed.',
+        message: result?.message || "Room allocation completed.",
       });
     } catch (allocationError) {
       setNotice({
-        type: 'error',
+        type: "error",
 
-        message:
-          allocationError.message,
+        message: allocationError.message,
       });
     } finally {
       setAutoAssigningId(null);
@@ -148,13 +102,10 @@ export default function AdmittedStudentsPage() {
       <AdminLayout>
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
           <h1 className="text-2xl font-bold text-red-800">
-            Admitted students could
-            not be loaded
+            Admitted students could not be loaded
           </h1>
 
-          <p className="mt-2 text-red-700">
-            {error?.message}
-          </p>
+          <p className="mt-2 text-red-700">{error?.message}</p>
 
           <button
             type="button"
@@ -182,9 +133,7 @@ export default function AdmittedStudentsPage() {
             </h1>
 
             <p className="mt-2 max-w-3xl text-slate-600">
-              View admitted candidates
-              and manage their hostel
-              assignments.
+              View admitted candidates and manage their hostel assignments.
             </p>
           </div>
 
@@ -194,9 +143,7 @@ export default function AdmittedStudentsPage() {
             disabled={isFetching}
             className="self-start rounded-lg border border-blue-900 px-5 py-3 font-semibold text-blue-900 hover:bg-blue-50 disabled:opacity-50"
           >
-            {isFetching
-              ? 'Refreshing...'
-              : 'Refresh'}
+            {isFetching ? "Refreshing..." : "Refresh"}
           </button>
         </header>
 
@@ -210,27 +157,21 @@ export default function AdmittedStudentsPage() {
 
           <SummaryCard
             label="Awaiting Room"
-            value={
-              summary.awaitingRoom
-            }
+            value={summary.awaitingRoom}
             description="Ready for allocation"
             color="amber"
           />
 
           <SummaryCard
             label="Room Allocated"
-            value={
-              summary.roomAllocated
-            }
+            value={summary.roomAllocated}
             description="Assigned students"
             color="emerald"
           />
 
           <SummaryCard
             label="Gender Required"
-            value={
-              summary.withoutGender
-            }
+            value={summary.withoutGender}
             description="Cannot allocate yet"
             color="red"
           />
@@ -240,9 +181,7 @@ export default function AdmittedStudentsPage() {
           <Notice
             type={notice.type}
             message={notice.message}
-            onClose={() =>
-              setNotice(null)
-            }
+            onClose={() => setNotice(null)}
           />
         )}
 
@@ -254,8 +193,7 @@ export default function AdmittedStudentsPage() {
               </h2>
 
               <p className="mt-1 text-sm text-slate-500">
-                Search students and review
-                room-allocation status.
+                Search students and review room-allocation status.
               </p>
             </div>
 
@@ -263,39 +201,23 @@ export default function AdmittedStudentsPage() {
               <input
                 type="search"
                 value={search}
-                onChange={(event) =>
-                  setSearch(
-                    event.target.value
-                  )
-                }
+                onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search student..."
                 className="min-w-64 rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-100"
               />
 
               <select
                 value={statusFilter}
-                onChange={(event) =>
-                  setStatusFilter(
-                    event.target.value
-                  )
-                }
+                onChange={(event) => setStatusFilter(event.target.value)}
                 className="rounded-lg border border-slate-300 bg-white px-4 py-3"
               >
-                <option value="all">
-                  All room statuses
-                </option>
+                <option value="all">All room statuses</option>
 
-                <option value="awaiting">
-                  Awaiting room
-                </option>
+                <option value="awaiting">Awaiting room</option>
 
-                <option value="allocated">
-                  Room allocated
-                </option>
+                <option value="allocated">Room allocated</option>
 
-                <option value="gender_required">
-                  Gender required
-                </option>
+                <option value="gender_required">Gender required</option>
               </select>
             </div>
           </div>
@@ -307,8 +229,7 @@ export default function AdmittedStudentsPage() {
               </h3>
 
               <p className="mt-2 text-slate-500">
-                No admitted students match
-                the selected filter.
+                No admitted students match the selected filter.
               </p>
             </div>
           ) : (
@@ -317,88 +238,53 @@ export default function AdmittedStudentsPage() {
                 <table className="w-full">
                   <thead className="bg-slate-50 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                     <tr>
-                      <th className="px-6 py-4">
-                        Student
-                      </th>
+                      <th className="px-6 py-4">Student</th>
 
-                      <th className="px-6 py-4">
-                        Intake
-                      </th>
+                      <th className="px-6 py-4">Intake</th>
 
-                      <th className="px-6 py-4">
-                        Gender
-                      </th>
+                      <th className="px-6 py-4">Gender</th>
 
-                      <th className="px-6 py-4">
-                        Room Assignment
-                      </th>
+                      <th className="px-6 py-4">Room Assignment</th>
 
-                      <th className="px-6 py-4">
-                        Status
-                      </th>
+                      <th className="px-6 py-4">Status</th>
 
-                      <th className="px-6 py-4 text-right">
-                        Actions
-                      </th>
+                      <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
                   </thead>
 
                   <tbody className="divide-y divide-slate-200">
-                    {filteredStudents.map(
-                      (student) => (
-                        <StudentRow
-                          key={
-                            student.application_id
-                          }
-                          student={student}
-                          autoAssigning={
-                            autoAssigning &&
-                            autoAssigningId ===
-                              student.application_id
-                          }
-                          onAutoAssign={() =>
-                            handleAutoAssign(
-                              student
-                            )
-                          }
-                          onManualAssign={() =>
-                            setSelectedStudent(
-                              student
-                            )
-                          }
-                        />
-                      )
-                    )}
+                    {filteredStudents.map((student) => (
+                      <StudentRow
+                        key={student.application_id}
+                        student={student}
+                        autoAssigning={
+                          autoAssigning &&
+                          autoAssigningId === student.application_id
+                        }
+                        onAutoAssign={() => handleAutoAssign(student)}
+                        onManualAssign={() => setSelectedStudent(student)}
+                        onReleaseRoom={() => setStudentToRelease(student)}
+                      />
+                    ))}
                   </tbody>
                 </table>
               </div>
 
               <div className="grid gap-4 p-4 lg:hidden">
-                {filteredStudents.map(
-                  (student) => (
-                    <StudentCard
-                      key={
-                        student.application_id
-                      }
-                      student={student}
-                      autoAssigning={
-                        autoAssigning &&
-                        autoAssigningId ===
-                          student.application_id
-                      }
-                      onAutoAssign={() =>
-                        handleAutoAssign(
-                          student
-                        )
-                      }
-                      onManualAssign={() =>
-                        setSelectedStudent(
-                          student
-                        )
-                      }
-                    />
-                  )
-                )}
+                {filteredStudents.map((student) => (
+
+                  <StudentCard
+                    key={student.application_id}
+                    student={student}
+                    autoAssigning={
+                      autoAssigning &&
+                      autoAssigningId === student.application_id
+                    }
+                    onAutoAssign={() => handleAutoAssign(student)}
+                    onManualAssign={() => setSelectedStudent(student)}
+                    onReleaseRoom={() => setStudentToRelease(student)}
+                  />
+                ))}
               </div>
             </>
           )}
@@ -406,100 +292,98 @@ export default function AdmittedStudentsPage() {
       </div>
 
       <AssignRoomModal
-        open={Boolean(
-          selectedStudent
-        )}
-        student={selectedStudent}
-        onClose={() =>
-          setSelectedStudent(null)
-        }
-      />
+  open={Boolean(
+    selectedStudent
+  )}
+  student={selectedStudent}
+  onClose={() =>
+    setSelectedStudent(null)
+  }
+/>
+
+<ReleaseRoomModal
+  open={Boolean(
+    studentToRelease
+  )}
+  applicationId={
+    studentToRelease
+      ?.application_id
+  }
+  candidateName={
+    studentToRelease
+      ?.candidate_name
+  }
+  roomName={
+    studentToRelease
+      ?.assignment
+      ?.room_name
+  }
+  onClose={() =>
+    setStudentToRelease(null)
+  }
+  onReleased={(result) => {
+    setNotice({
+      type: 'success',
+
+      message:
+        result?.message ||
+        'The room assignment was released successfully.',
+    });
+  }}
+/>
     </AdminLayout>
   );
 }
 
-function StudentRow({
-  student,
-  autoAssigning,
-  onAutoAssign,
-  onManualAssign,
-}) {
+function StudentRow({ student, autoAssigning, onAutoAssign, onManualAssign,onReleaseRoom}) {
   return (
     <tr className="hover:bg-slate-50">
       <td className="px-6 py-5">
-        <StudentIdentity
-          student={student}
-        />
+        <StudentIdentity student={student} />
       </td>
 
       <td className="px-6 py-5">
         <p className="font-semibold text-slate-700">
-          {student.intake_name || '—'}
+          {student.intake_name || "—"}
         </p>
 
         <p className="mt-1 text-xs text-slate-500">
-          {student.preferred_programme ||
-            'Programme not provided'}
+          {student.preferred_programme || "Programme not provided"}
         </p>
       </td>
 
       <td className="px-6 py-5 capitalize text-slate-700">
-        {student.gender ||
-          'Not provided'}
+        {student.gender || "Not provided"}
       </td>
 
       <td className="px-6 py-5">
-        <AssignmentDetails
-          assignment={
-            student.assignment
-          }
-        />
+        <AssignmentDetails assignment={student.assignment} />
       </td>
 
       <td className="px-6 py-5">
-        <RoomStatusBadge
-          status={
-            student.room_status
-          }
-        />
+        <RoomStatusBadge status={student.room_status} />
       </td>
 
       <td className="px-6 py-5">
         <StudentActions
           student={student}
-          autoAssigning={
-            autoAssigning
-          }
-          onAutoAssign={
-            onAutoAssign
-          }
-          onManualAssign={
-            onManualAssign
-          }
+          autoAssigning={autoAssigning}
+          onAutoAssign={onAutoAssign}
+          onManualAssign={onManualAssign}
+            onReleaseRoom={onReleaseRoom}
         />
       </td>
     </tr>
   );
 }
 
-function StudentCard({
-  student,
-  autoAssigning,
-  onAutoAssign,
-  onManualAssign,
-}) {
+function StudentCard({ student, autoAssigning, onAutoAssign, onManualAssign, onReleaseRoom }) {
   return (
     <article className="rounded-xl border border-slate-200 p-5">
       <div className="flex items-start justify-between gap-3">
-        <StudentIdentity
-          student={student}
-        />
+        <StudentIdentity student={student} />
 
-        <RoomStatusBadge
-          status={
-            student.room_status
-          }
-        />
+        <RoomStatusBadge status={student.room_status} />
       </div>
 
       <div className="mt-5 grid gap-4 rounded-xl bg-slate-50 p-4 sm:grid-cols-2">
@@ -509,8 +393,7 @@ function StudentCard({
           </p>
 
           <p className="mt-1 font-semibold capitalize text-slate-800">
-            {student.gender ||
-              'Not provided'}
+            {student.gender || "Not provided"}
           </p>
         </div>
 
@@ -520,8 +403,7 @@ function StudentCard({
           </p>
 
           <p className="mt-1 font-semibold text-slate-800">
-            {student.intake_name ||
-              '—'}
+            {student.intake_name || "—"}
           </p>
         </div>
       </div>
@@ -532,79 +414,56 @@ function StudentCard({
         </p>
 
         <div className="mt-2">
-          <AssignmentDetails
-            assignment={
-              student.assignment
-            }
-          />
+          <AssignmentDetails assignment={student.assignment} />
         </div>
       </div>
 
       <div className="mt-5">
         <StudentActions
           student={student}
-          autoAssigning={
-            autoAssigning
-          }
-          onAutoAssign={
-            onAutoAssign
-          }
-          onManualAssign={
-            onManualAssign
-          }
+          autoAssigning={autoAssigning}
+          onAutoAssign={onAutoAssign}
+          onManualAssign={onManualAssign}
+            onReleaseRoom={onReleaseRoom}
         />
       </div>
     </article>
   );
 }
 
-function StudentIdentity({
-  student,
-}) {
+function StudentIdentity({ student }) {
   return (
     <div>
-      <p className="font-bold text-slate-900">
-        {student.candidate_name}
-      </p>
+      <p className="font-bold text-slate-900">{student.candidate_name}</p>
 
       <p className="mt-1 text-sm text-slate-500">
         {student.application_number}
       </p>
 
       <p className="mt-1 text-xs text-slate-400">
-        {student.candidate_email ||
-          'No email provided'}
+        {student.candidate_email || "No email provided"}
       </p>
     </div>
   );
 }
 
-function AssignmentDetails({
-  assignment,
-}) {
+function AssignmentDetails({ assignment }) {
   if (!assignment) {
-    return (
-      <p className="text-sm text-slate-400">
-        Not assigned
-      </p>
-    );
+    return <p className="text-sm text-slate-400">Not assigned</p>;
   }
 
   return (
     <div>
-      <p className="font-bold text-blue-900">
-        {assignment.house_name}
-      </p>
+      <p className="font-bold text-blue-900">{assignment.house_name}</p>
 
       <p className="mt-1 text-sm text-slate-600">
         {assignment.room_name}
-        {' · '}
+        {" · "}
         {assignment.bed_label}
       </p>
 
       <p className="mt-1 text-xs capitalize text-slate-400">
-        Assigned by{' '}
-        {assignment.assignment_source}
+        Assigned by {assignment.assignment_source}
       </p>
     </div>
   );
@@ -615,11 +474,9 @@ function StudentActions({
   autoAssigning,
   onAutoAssign,
   onManualAssign,
+  onReleaseRoom
 }) {
-  if (
-    student.room_status ===
-    'gender_required'
-  ) {
+  if (student.room_status === "gender_required") {
     return (
       <div className="text-right">
         <button
@@ -634,10 +491,7 @@ function StudentActions({
     );
   }
 
-  if (
-    student.room_status ===
-    'allocated'
-  ) {
+  if (student.room_status === "allocated") {
     return (
       <div className="flex justify-end">
         <button
@@ -647,6 +501,14 @@ function StudentActions({
         >
           Change Room
         </button>
+
+         <button
+        type="button"
+        onClick={onReleaseRoom}
+        className="rounded-lg border border-red-600 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50"
+      >
+        Unassign Room
+      </button>
       </div>
     );
   }
@@ -659,9 +521,7 @@ function StudentActions({
         disabled={autoAssigning}
         className="rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
       >
-        {autoAssigning
-          ? 'Assigning...'
-          : 'Auto Assign'}
+        {autoAssigning ? "Assigning..." : "Auto Assign"}
       </button>
 
       <button
@@ -676,32 +536,25 @@ function StudentActions({
   );
 }
 
-function RoomStatusBadge({
-  status,
-}) {
+function RoomStatusBadge({ status }) {
   const settings = {
     allocated: {
-      label: 'Allocated',
-      style:
-        'bg-emerald-100 text-emerald-700',
+      label: "Allocated",
+      style: "bg-emerald-100 text-emerald-700",
     },
 
     awaiting: {
-      label: 'Awaiting Room',
-      style:
-        'bg-amber-100 text-amber-700',
+      label: "Awaiting Room",
+      style: "bg-amber-100 text-amber-700",
     },
 
     gender_required: {
-      label: 'Gender Required',
-      style:
-        'bg-red-100 text-red-700',
+      label: "Gender Required",
+      style: "bg-red-100 text-red-700",
     },
   };
 
-  const setting =
-    settings[status] ||
-    settings.awaiting;
+  const setting = settings[status] || settings.awaiting;
 
   return (
     <span
@@ -712,26 +565,17 @@ function RoomStatusBadge({
   );
 }
 
-function SummaryCard({
-  label,
-  value = 0,
-  description,
-  color,
-}) {
+function SummaryCard({ label, value = 0, description, color }) {
   const colors = {
-    blue: 'bg-blue-50 text-blue-900',
-    amber:
-      'bg-amber-50 text-amber-700',
-    emerald:
-      'bg-emerald-50 text-emerald-700',
-    red: 'bg-red-50 text-red-700',
+    blue: "bg-blue-50 text-blue-900",
+    amber: "bg-amber-50 text-amber-700",
+    emerald: "bg-emerald-50 text-emerald-700",
+    red: "bg-red-50 text-red-700",
   };
 
   return (
     <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="font-semibold text-slate-600">
-        {label}
-      </p>
+      <p className="font-semibold text-slate-600">{label}</p>
 
       <div
         className={`mt-4 inline-flex min-w-16 justify-center rounded-xl px-4 py-3 text-3xl font-bold ${colors[color]}`}
@@ -739,27 +583,18 @@ function SummaryCard({
         {value}
       </div>
 
-      <p className="mt-3 text-sm text-slate-500">
-        {description}
-      </p>
+      <p className="mt-3 text-sm text-slate-500">{description}</p>
     </article>
   );
 }
 
-function Notice({
-  type,
-  message,
-  onClose,
-}) {
+function Notice({ type, message, onClose }) {
   const styles = {
-    success:
-      'border-emerald-200 bg-emerald-50 text-emerald-800',
+    success: "border-emerald-200 bg-emerald-50 text-emerald-800",
 
-    warning:
-      'border-amber-200 bg-amber-50 text-amber-800',
+    warning: "border-amber-200 bg-amber-50 text-amber-800",
 
-    error:
-      'border-red-200 bg-red-50 text-red-800',
+    error: "border-red-200 bg-red-50 text-red-800",
   };
 
   return (
@@ -767,9 +602,7 @@ function Notice({
       className={`flex items-start justify-between gap-4 rounded-xl border p-4 ${styles[type]}`}
       role="status"
     >
-      <p className="font-semibold">
-        {message}
-      </p>
+      <p className="font-semibold">{message}</p>
 
       <button
         type="button"
@@ -783,14 +616,10 @@ function Notice({
   );
 }
 
-function PageMessage({
-  message,
-}) {
+function PageMessage({ message }) {
   return (
     <div className="flex min-h-[50vh] items-center justify-center">
-      <p className="text-lg font-semibold text-slate-600">
-        {message}
-      </p>
+      <p className="text-lg font-semibold text-slate-600">{message}</p>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useDocuments } from '../../hooks/useDocuments';
@@ -22,13 +22,15 @@ export default function DocumentUploadStep({
     deleting,
   } = useDocuments(application.id);
 
-  const [selectedFiles, setSelectedFiles] =
-    useState({});
+  const fileInputRefs = useRef({});
 
   const [identityType, setIdentityType] =
     useState('nin');
 
   const [activeUpload, setActiveUpload] =
+    useState('');
+
+  const [openMenu, setOpenMenu] =
     useState('');
 
   const [message, setMessage] = useState('');
@@ -44,23 +46,7 @@ export default function DocumentUploadStep({
     });
   }
 
-  function handleFileChange(
-    documentTypeId,
-    file
-  ) {
-    setSelectedFiles((current) => ({
-      ...current,
-      [documentTypeId]: file,
-    }));
-
-    setMessage('');
-    setMessageType('');
-  }
-
-  async function handleUpload(documentType) {
-    const file =
-      selectedFiles[documentType.id];
-
+  async function handleUpload(documentType, file) {
     if (!file) {
       setMessage(
         `Select a file for ${documentType.name}.`
@@ -86,11 +72,6 @@ export default function DocumentUploadStep({
         file,
       });
 
-      setSelectedFiles((current) => ({
-        ...current,
-        [documentType.id]: null,
-      }));
-
       setMessage(
         `${documentType.name} uploaded successfully.`
       );
@@ -100,7 +81,36 @@ export default function DocumentUploadStep({
       setMessageType('error');
     } finally {
       setActiveUpload('');
+
+      const input =
+        fileInputRefs.current[documentType.id];
+
+      if (input) {
+        input.value = '';
+      }
     }
+  }
+
+  async function handleFileChange(
+    documentType,
+    file
+  ) {
+    if (!file) return;
+
+    setOpenMenu('');
+    await handleUpload(documentType, file);
+  }
+
+  function openFilePicker(documentTypeId) {
+    if (
+      uploading ||
+      deleting ||
+      application.status !== 'draft'
+    ) {
+      return;
+    }
+
+    fileInputRefs.current[documentTypeId]?.click();
   }
 
   async function handleDelete(document) {
@@ -117,6 +127,8 @@ export default function DocumentUploadStep({
       setMessageType('');
 
       await deleteDocument(document);
+
+      setOpenMenu('');
 
       setMessage('Document deleted successfully.');
       setMessageType('success');
@@ -247,9 +259,6 @@ export default function DocumentUploadStep({
                   documentType.id
                 );
 
-              const selectedFile =
-                selectedFiles[documentType.id];
-
               const isUploadingThis =
                 uploading &&
                 activeUpload === documentType.id;
@@ -314,73 +323,140 @@ export default function DocumentUploadStep({
                     </div>
                   )}
 
-                  {uploaded && (
-                    <div className="mt-5 rounded-md bg-slate-50 p-4">
-                      <p className="break-all text-sm font-medium text-slate-800">
-                        {uploaded.original_filename}
-                      </p>
+                  <input
+                    ref={(element) => {
+                      fileInputRefs.current[
+                        documentType.id
+                      ] = element;
+                    }}
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                    onChange={(event) =>
+                      handleFileChange(
+                        documentType,
+                        event.target.files?.[0] || null
+                      )
+                    }
+                    className="sr-only"
+                    disabled={
+                      isUploadingThis ||
+                      deleting ||
+                      application.status !== 'draft'
+                    }
+                  />
 
-                      <p className="mt-1 text-xs text-slate-500">
-                        Status:{' '}
-                        {formatStatus(
-                          uploaded.verification_status
-                        )}
-                      </p>
-
-                      {uploaded.rejection_reason && (
-                        <p className="mt-2 text-sm text-red-700">
-                          {uploaded.rejection_reason}
-                        </p>
-                      )}
-
+                  {uploaded ? (
+                    <div className="relative mt-5">
                       <button
                         type="button"
                         onClick={() =>
-                          handleDelete(uploaded)
+                          openFilePicker(documentType.id)
                         }
                         disabled={
+                          isUploadingThis ||
                           deleting ||
                           application.status !== 'draft'
                         }
-                        className="mt-3 text-sm font-semibold text-red-700 disabled:opacity-50"
+                        aria-label={`Change ${documentType.name}`}
+                        className="group flex w-full items-center gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 pr-14 text-left transition hover:border-blue-300 hover:bg-blue-50/50 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        Delete document
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white text-xl shadow-sm">
+                          {uploaded.original_filename
+                            ?.toLowerCase()
+                            .endsWith('.pdf')
+                            ? 'PDF'
+                            : 'IMG'}
+                        </span>
+
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-semibold text-slate-800">
+                            {uploaded.original_filename}
+                          </span>
+
+                          <span className="mt-1 block text-xs text-slate-500">
+                            {isUploadingThis
+                              ? 'Uploading new document...'
+                              : `Status: ${formatStatus(
+                                  uploaded.verification_status
+                                )}`}
+                          </span>
+
+                          <span className="mt-1 block text-xs font-semibold text-blue-800 opacity-0 transition group-hover:opacity-100 group-focus:opacity-100">
+                            Click to change document
+                          </span>
+                        </span>
                       </button>
+
+                      <button
+                        type="button"
+                        aria-label={`More options for ${documentType.name}`}
+                        aria-expanded={
+                          openMenu === documentType.id
+                        }
+                        onClick={() =>
+                          setOpenMenu((current) =>
+                            current === documentType.id
+                              ? ''
+                              : documentType.id
+                          )
+                        }
+                        disabled={
+                          isUploadingThis ||
+                          deleting ||
+                          application.status !== 'draft'
+                        }
+                        className="absolute right-3 top-3 rounded-md px-3 py-2 text-xl font-bold leading-none text-slate-500 hover:bg-white hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-700 disabled:opacity-50"
+                      >
+                        ⋮
+                      </button>
+
+                      {openMenu === documentType.id && (
+                        <div className="absolute right-3 top-12 z-10 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleDelete(uploaded)
+                            }
+                            disabled={deleting}
+                            className="w-full rounded-md px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
+                          >
+                            {deleting
+                              ? 'Deleting...'
+                              : 'Delete document'}
+                          </button>
+                        </div>
+                      )}
+
+                      {uploaded.rejection_reason && (
+                        <p className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
+                          {uploaded.rejection_reason}
+                        </p>
+                      )}
                     </div>
-                  )}
-
-                  <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                    <input
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                      onChange={(event) =>
-                        handleFileChange(
-                          documentType.id,
-                          event.target.files?.[0] ||
-                            null
-                        )
-                      }
-                      className="block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-                    />
-
+                  ) : (
                     <button
                       type="button"
                       onClick={() =>
-                        handleUpload(documentType)
+                        openFilePicker(documentType.id)
                       }
                       disabled={
-                        !selectedFile ||
-                        isUploadingThis
+                        isUploadingThis ||
+                        deleting ||
+                        application.status !== 'draft'
                       }
-                      className="rounded-md bg-blue-900 px-5 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                      className="mt-5 flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 px-5 py-8 text-center transition hover:border-blue-400 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {isUploadingThis
-                        ? 'Uploading...'
-                        : uploaded
-                          ? 'Replace'
-                          : 'Upload'}
+                      <span className="text-sm font-semibold text-blue-900">
+                        {isUploadingThis
+                          ? 'Uploading document...'
+                          : 'Choose a document'}
+                      </span>
+
+                      <span className="mt-1 text-xs text-slate-500">
+                        PDF, JPG or PNG · Maximum 5 MB
+                      </span>
                     </button>
-                  </div>
+                  )}
                 </article>
               );
             })}

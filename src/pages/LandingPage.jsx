@@ -56,11 +56,10 @@ export default function LandingPage() {
 
             <div>
               <p className="font-serif text-xl font-bold text-blue-900">
-                Zion-LightApp
               </p>
 
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">
-                Admissions
+              <p className="text-[10px]  font-bold uppercase tracking-wider text-amber-600">
+                Pioneer Cohort Admissions
               </p>
             </div>
           </Link>

@@ -125,3 +125,37 @@ export async function autoAssignCandidateRoom(
 
   return data;
 }
+
+export async function releaseCandidateRoom({
+  applicationId,
+  reason,
+}) {
+  if (!applicationId) {
+    throw new Error(
+      'The application ID is required.'
+    );
+  }
+
+  if (!reason?.trim()) {
+    throw new Error(
+      'Enter a reason for releasing this room assignment.'
+    );
+  }
+
+  const { data, error } = await supabase.rpc(
+    'release_candidate_room',
+    {
+      p_application_id:
+        applicationId,
+
+      p_reason:
+        reason.trim(),
+    }
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
