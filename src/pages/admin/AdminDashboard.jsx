@@ -77,7 +77,7 @@ export default function AdminDashboard() {
 
             <h2 className="mt-2 text-2xl font-bold text-blue-900">
               {summary?.total || 0}{' '}
-              submitted application
+              Submitted Application
               {summary?.total === 1
                 ? ''
                 : 's'}
@@ -468,7 +468,7 @@ function ComingSoonAction({
         </p>
 
         <span className="text-[10px] font-bold uppercase">
-          Soon
+          Updating Soon
         </span>
       </div>
 

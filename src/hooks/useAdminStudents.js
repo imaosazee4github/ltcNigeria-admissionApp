@@ -9,6 +9,7 @@ import {
   autoAssignCandidateRoom,
   getAdminAdmittedStudents,
   getAvailableBedSpaces,
+  releaseCandidateRoom,
 } from '../services/adminStudentService';
 
 export const adminStudentsQueryKey = [
@@ -194,6 +195,72 @@ export function useAutoAssignCandidateRoom() {
       mutation.data,
 
     resetAutoAssignment:
+      mutation.reset,
+  };
+}
+
+export function useReleaseCandidateRoom() {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: releaseCandidateRoom,
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: [
+            'admin-admitted-students',
+          ],
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: [
+            'admin-rooms',
+          ],
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: [
+            'admin-dashboard-summary',
+          ],
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: [
+            'candidate-room-assignment',
+          ],
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: [
+            'candidate-application',
+          ],
+        }),
+      ]);
+    },
+
+    onError: (error) => {
+      console.error(
+        'Room release failed:',
+        error
+      );
+    },
+  });
+
+  return {
+    releaseRoom:
+      mutation.mutateAsync,
+
+    releasing:
+      mutation.isPending,
+
+    releaseError:
+      mutation.error,
+
+    releaseResult:
+      mutation.data,
+
+    resetRelease:
       mutation.reset,
   };
 }

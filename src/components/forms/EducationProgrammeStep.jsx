@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function EducationProgrammeStep({
   candidateProfile,
@@ -11,28 +11,21 @@ export default function EducationProgrammeStep({
   const currentYear = new Date().getFullYear();
 
   const [formData, setFormData] = useState({
-    highest_qualification:
-      candidateProfile.highest_qualification || '',
+    highest_qualification: candidateProfile.highest_qualification || "",
 
-    institution_name:
-      candidateProfile.institution_name || '',
+    institution_name: candidateProfile.institution_name || "",
 
-    field_of_study:
-      candidateProfile.field_of_study || '',
+    field_of_study: candidateProfile.field_of_study || "",
 
-    graduation_year:
-      candidateProfile.graduation_year || '',
+    graduation_year: candidateProfile.graduation_year || "",
 
-    skills_experience:
-      candidateProfile.skills_experience || '',
+    skills_experience: candidateProfile.skills_experience || "",
 
-    preferred_programme:
-      candidateProfile.preferred_programme || '',
+    preferred_programme: candidateProfile.preferred_programme || "",
   });
 
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] =
-    useState('');
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
   const [saving, setSaving] = useState(false);
 
   function handleChange(event) {
@@ -43,74 +36,60 @@ export default function EducationProgrammeStep({
       [name]: value,
     }));
 
-    setMessage('');
-    setMessageType('');
+    setMessage("");
+    setMessageType("");
   }
 
   function validateForm() {
     if (!formData.highest_qualification) {
-      return 'Select your highest educational qualification.';
+      return "Select your highest educational qualification.";
     }
 
     if (formData.graduation_year) {
-      const graduationYear = Number(
-        formData.graduation_year
-      );
+      const graduationYear = Number(formData.graduation_year);
 
-      if (
-        graduationYear < 1950 ||
-        graduationYear > currentYear
-      ) {
+      if (graduationYear < 1950 || graduationYear > currentYear) {
         return `Graduation year must be between 1950 and ${currentYear}.`;
       }
     }
 
-    return '';
+    return "";
   }
 
   function prepareUpdates() {
     return {
-      highest_qualification:
-        formData.highest_qualification,
+      highest_qualification: formData.highest_qualification,
 
-      institution_name:
-        formData.institution_name.trim() || null,
+      institution_name: formData.institution_name.trim() || null,
 
-      field_of_study:
-        formData.field_of_study.trim() || null,
+      field_of_study: formData.field_of_study.trim() || null,
 
-      graduation_year:
-        formData.graduation_year
-          ? Number(formData.graduation_year)
-          : null,
+      graduation_year: formData.graduation_year
+        ? Number(formData.graduation_year)
+        : null,
 
-      skills_experience:
-        formData.skills_experience.trim() || null,
+      skills_experience: formData.skills_experience.trim() || null,
 
-      preferred_programme:
-        formData.preferred_programme.trim() || null,
+      preferred_programme: formData.preferred_programme.trim() || null,
     };
   }
 
-  async function saveInformation(
-    continueToNextStep
-  ) {
+  async function saveInformation(continueToNextStep) {
     const validationError = validateForm();
 
     if (validationError) {
       setMessage(validationError);
-      setMessageType('error');
+      setMessageType("error");
       return;
     }
 
     try {
       setSaving(true);
-      setMessage('');
-      setMessageType('');
+      setMessage("");
+      setMessageType("");
 
       await saveCandidateProfile({
-        candidateProfileId:
-          candidateProfile.id,
+        candidateProfileId: candidateProfile.id,
 
         updates: prepareUpdates(),
       });
@@ -122,14 +101,14 @@ export default function EducationProgrammeStep({
           completionPercentage: 75,
         });
 
-        navigate('/candidate/dashboard');
+        navigate("/candidate/dashboard");
         return;
       }
 
-      navigate('/candidate/dashboard');
+      navigate("/candidate/dashboard");
     } catch (error) {
       setMessage(error.message);
-      setMessageType('error');
+      setMessageType("error");
     } finally {
       setSaving(false);
     }
@@ -149,9 +128,7 @@ export default function EducationProgrammeStep({
       <div className="mx-auto max-w-5xl">
         <button
           type="button"
-          onClick={() =>
-            navigate('/candidate/dashboard')
-          }
+          onClick={() => navigate("/candidate/dashboard")}
           className="font-medium text-blue-900"
         >
           ← Return to dashboard
@@ -159,78 +136,72 @@ export default function EducationProgrammeStep({
 
         <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
           <header className="border-b border-slate-200 pb-6">
-            <p className="text-sm font-semibold text-blue-700">
-              Step 5 of 7
-            </p>
+            <p className="text-sm font-semibold text-blue-700">Step 5 of 7</p>
 
             <h1 className="mt-2 text-3xl font-bold text-blue-900">
               Education and Programme Information
             </h1>
 
             <p className="mt-2 text-slate-600">
-              Tell us about your educational background,
-              skills and programme interests.
+              Tell us about your educational background, skills and programme
+              interests.
             </p>
           </header>
 
           {message && (
             <div
               className={
-                messageType === 'success'
-                  ? 'mt-6 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-700'
-                  : 'mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700'
+                messageType === "success"
+                  ? "mt-6 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-700"
+                  : "mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700"
               }
             >
               {message}
             </div>
           )}
 
-          <form
-            onSubmit={handleSubmit}
-            className="mt-7 space-y-8"
-          >
+          <form onSubmit={handleSubmit} className="mt-7 space-y-8">
             <section>
               <h2 className="text-lg font-bold text-blue-900">
                 Educational Background
               </h2>
 
               <p className="mt-1 text-sm text-slate-500">
-                Only your highest qualification is required.
-                Institution details are optional.
+                Only your highest qualification is required. Institution details
+                are optional.
               </p>
 
               <div className="mt-5 grid gap-5 md:grid-cols-2">
                 <SelectField
                   label="Highest Qualification"
                   name="highest_qualification"
-                  value={
-                    formData.highest_qualification
-                  }
+                  value={formData.highest_qualification}
                   onChange={handleChange}
                   options={[
                     {
-                      value: 'secondary_school',
-                      label: 'Secondary School',
+                      value: "ssce_waec_neco",
+                      label:
+                        "Senior Secondary School Certificate (SSCE/WAEC/NECO)",
                     },
                     {
-                      value: 'certificate',
-                      label: 'Certificate',
+                      value: "national_diploma",
+                      label: "National Diploma (ND)",
                     },
                     {
-                      value: 'diploma',
-                      label: 'Diploma',
+                      value: "higher_national_diploma",
+                      label: "Higher National Diploma (HND)",
                     },
                     {
-                      value: 'bachelors_degree',
-                      label: "Bachelor's Degree",
+                      value: "nce",
+                      label: "NCE (National Certificate in Education)",
                     },
                     {
-                      value: 'postgraduate_degree',
-                      label: 'Postgraduate Degree',
+                      value: "vocational_technical_certificate",
+                      label: "Vocational/Technical Certificate",
                     },
                     {
-                      value: 'other',
-                      label: 'Other',
+                      value: "other",
+                      label: "Other",
                     },
                   ]}
                 />
@@ -307,9 +278,8 @@ export default function EducationProgrammeStep({
             </section>
 
             <div className="rounded-md bg-blue-50 p-4 text-sm text-blue-900">
-              Candidates who have not attended a higher
-              institution can leave the institution, field of
-              study and graduation year fields empty.
+              Candidates who have not attended a higher institution can leave
+              the institution, field of study and graduation year fields empty.
             </div>
 
             <div className="flex flex-col-reverse justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
@@ -327,9 +297,7 @@ export default function EducationProgrammeStep({
                 disabled={saving}
                 className="rounded-md bg-blue-900 px-6 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {saving
-                  ? 'Saving...'
-                  : 'Save and Continue'}
+                {saving ? "Saving..." : "Save and Continue"}
               </button>
             </div>
           </form>
@@ -342,7 +310,7 @@ export default function EducationProgrammeStep({
 function FormField({
   label,
   name,
-  type = 'text',
+  type = "text",
   value,
   onChange,
   placeholder,
@@ -377,13 +345,7 @@ function FormField({
   );
 }
 
-function SelectField({
-  label,
-  name,
-  value,
-  onChange,
-  options,
-}) {
+function SelectField({ label, name, value, onChange, options }) {
   return (
     <div>
       <label
@@ -392,9 +354,7 @@ function SelectField({
       >
         {label}
 
-        <span className="ml-1 text-red-600">
-          *
-        </span>
+        <span className="ml-1 text-red-600">*</span>
       </label>
 
       <select
@@ -405,15 +365,10 @@ function SelectField({
         required
         className="w-full rounded-md border border-slate-300 bg-white px-3 py-3 outline-none focus:border-blue-800 focus:ring-2 focus:ring-blue-100"
       >
-        <option value="">
-          Select your highest qualification
-        </option>
+        <option value="">Select your highest qualification</option>
 
         {options.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-          >
+          <option key={option.value} value={option.value}>
             {option.label}
           </option>
         ))}

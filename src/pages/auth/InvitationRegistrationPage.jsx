@@ -11,11 +11,6 @@ import {
   validateLeaderInvitation,
 } from "../../services/invitationRegistrationService";
 
-// import {
-//   acceptLeaderInvitation,
-//   registerInvitedLeader,
-//   validateLeaderInvitation,
-// } from '../../services/invitationRegistrationService';
 
 export default function InvitationRegistrationPage() {
   const { token } = useParams();
@@ -229,20 +224,8 @@ export default function InvitationRegistrationPage() {
 
         setMessageType("success");
       }
-
-      //   if (result.session) {
-      //     setMessage(
-      //       'Account created. Accepting your invitation...'
-      //     );
-
-      //     setMessageType('success');
-      //   } else {
-      //     setMessage(
-      //       'Account created. Check your email and click the verification link to complete your registration.'
-      //     );
-
-      //     setMessageType('success');
-      //   }
+  
+    
     } catch (error) {
       setMessage(error.message);
       setMessageType("error");

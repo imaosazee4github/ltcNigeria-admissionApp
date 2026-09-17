@@ -11,11 +11,7 @@ export default function CandidateDashboard() {
   const { data, isLoading, isFetching, error, refreshRoomAssignment } =
     useApplication(profile?.id);
 
-  // const {
-  //   data,
-  //   isLoading,
-  //   error,
-  // } = useApplication(profile?.id);
+  
 
   if (isLoading) {
     return (
@@ -31,11 +27,7 @@ export default function CandidateDashboard() {
 
   const latestReview = data?.latestReview;
 
-  /*
-   * This will remain null until the room
-   * allocation service is connected later.
-   */
-  // const roomAssignment = data?.roomAssignment || null;
+
 
   const roomInformation = data?.roomAssignment || null;
 
@@ -248,11 +240,7 @@ export default function CandidateDashboard() {
                       }
                     />
 
-                    {/* <JourneyItem
-                      number="5"
-                      title="Room assigned"
-                      completed={application.status === "room_allocated"}
-                    /> */}
+                  
                   </div>
                 </article>
 
@@ -264,10 +252,7 @@ export default function CandidateDashboard() {
                   onRefresh={refreshRoomAssignment}
                 />
 
-                {/* <AssignedRoomCard
-                  status={application.status}
-                  roomAssignment={roomAssignment}
-                /> */}
+            
               </section>
             </>
           )}
@@ -531,51 +516,7 @@ function AssignedRoomCard({
     </article>
   );
 }
-// function AssignedRoomCard({ status, roomAssignment }) {
-//   if (
-//     !["admission_completed", "awaiting_room", "room_allocated"].includes(status)
-//   ) {
-//     return (
-//       <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-//         <h2 className="text-xl font-bold text-blue-900">Assigned Room</h2>
 
-//         <p className="mt-4 text-sm leading-6 text-slate-500">
-//           Room information will become available after your admission and
-//           endorsements are completed.
-//         </p>
-//       </article>
-//     );
-//   }
-
-//   if (status !== "room_allocated" || !roomAssignment) {
-//     return (
-//       <article className="rounded-xl border border-amber-200 bg-amber-50 p-6">
-//         <h2 className="text-xl font-bold text-amber-900">
-//           Room Assignment Pending
-//         </h2>
-
-//         <p className="mt-4 text-sm leading-6 text-amber-800">
-//           Your admission is complete. Your room is being assigned by the system
-//           or LTC Admin.
-//         </p>
-//       </article>
-//     );
-//   }
-
-//   return (
-//     <article className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
-//       <h2 className="text-xl font-bold text-emerald-900">Assigned Room</h2>
-
-//       <dl className="mt-5 space-y-5">
-//         <Detail label="Hostel" value={roomAssignment.hostel_name} />
-
-//         <Detail label="Room" value={roomAssignment.room_number} />
-
-//         <Detail label="Bed space" value={roomAssignment.bed_space} />
-//       </dl>
-//     </article>
-//   );
-// }
 
 function CorrectionNotice({ latestReview }) {
   return (
