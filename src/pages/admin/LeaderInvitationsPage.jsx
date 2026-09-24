@@ -202,7 +202,7 @@ export default function LeaderInvitationsPage() {
           </p>
 
           <h2 className="mt-2 text-2xl font-bold text-blue-900">
-            Invite Area Leader
+            Invite Stake President or District President
           </h2>
 
           <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -400,7 +400,7 @@ export default function LeaderInvitationsPage() {
         <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-200 p-6">
             <h2 className="text-xl font-bold text-blue-900">
-              Area Leader Invitations
+              Stake President or District President Invitations
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
