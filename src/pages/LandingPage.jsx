@@ -1,22 +1,52 @@
-import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import { getDashboardRoute } from '../utils/permissions';
+import {
+  useState,
+} from 'react';
+
+import {
+  Link,
+  Navigate,
+  useNavigate,
+} from 'react-router-dom';
+
+import {
+  useAuth,
+} from '../hooks/useAuth';
+
+import {
+  getDashboardRoute,
+} from '../utils/permissions';
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { signIn, session, role, loading } = useAuth();
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const {
+    signIn,
+    session,
+    role,
+    loading,
+  } = useAuth();
 
-  const [errorMessage, setErrorMessage] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] =
+    useState({
+      email: '',
+      password: '',
+    });
+
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState('');
+
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false);
 
   function handleChange(event) {
-    const { name, value } = event.target;
+    const {
+      name,
+      value,
+    } = event.target;
 
     setFormData((current) => ({
       ...current,
@@ -26,10 +56,13 @@ export default function LandingPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+
     setErrorMessage('');
     setSubmitting(true);
 
-    const { error } = await signIn(formData);
+    const {
+      error,
+    } = await signIn(formData);
 
     if (error) {
       setErrorMessage(error.message);
@@ -38,53 +71,104 @@ export default function LandingPage() {
     }
 
     setSubmitting(false);
-    navigate('/auth/redirect', { replace: true });
+
+    navigate(
+      '/auth/redirect',
+      {
+        replace: true,
+      }
+    );
   }
 
-  if (!loading && session && role) {
-    return <Navigate to={getDashboardRoute(role)} replace />;
+  if (
+    !loading &&
+    session &&
+    role
+  ) {
+    return (
+      <Navigate
+        to={getDashboardRoute(role)}
+        replace
+      />
+    );
   }
 
   return (
     <div className="min-h-screen bg-[#fbfaf7] text-slate-800">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-900 font-bold text-white">
+          <Link
+            to="/"
+            className="flex items-center gap-3"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-900 text-sm font-bold text-white">
               LTC
             </div>
 
             <div>
-              <p className="font-serif text-xl font-bold text-blue-900">
+              <p className="font-serif text-xl font-bold leading-none text-blue-900">
+                LightApp
               </p>
 
-              <p className="text-[10px]  font-bold uppercase tracking-wider text-amber-600">
-                Pioneer Cohort Admissions
+              <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-amber-600">
+                Pioneer Phase Admissions
               </p>
             </div>
           </Link>
 
           <nav className="hidden items-center gap-8 text-sm md:flex">
-            <a href="#process" className="text-blue-900">
+            <Link
+              to="/admission-process"
+              className="text-slate-700 transition hover:text-blue-900"
+            >
               About the Process
-            </a>
-
-            <Link to="/guidelines">
-              LTC Guidelines
-            </Link>
-
-            <Link to="/support">
-              Help & Support
             </Link>
 
             <Link
-              to="/portal/login"
-              className="rounded-md border border-blue-800 px-4 py-2 font-medium text-blue-900"
+              to="/ltc-guidelines"
+              className="text-slate-700 transition hover:text-blue-900"
             >
-              LTC Admin Portal
+              LTC Guidelines
             </Link>
+
+            <a
+              href="mailto:admission@nigerialtc.org"
+              className="text-slate-700 transition hover:text-blue-900"
+            >
+              Help & Support
+            </a>
+
+            <a
+              href="#sign-in"
+              className="rounded-md border border-blue-800 px-4 py-2 font-medium text-blue-900 transition hover:bg-blue-50"
+            >
+              Sign In
+            </a>
           </nav>
         </div>
+
+        <nav className="flex gap-5 overflow-x-auto border-t border-slate-100 px-6 py-3 text-sm md:hidden">
+          <Link
+            to="/admission-process"
+            className="whitespace-nowrap font-medium text-slate-700"
+          >
+            Admission Process
+          </Link>
+
+          <Link
+            to="/ltc-guidelines"
+            className="whitespace-nowrap font-medium text-slate-700"
+          >
+            LTC Guidelines
+          </Link>
+
+          <a
+            href="mailto:admission@nigerialtc.org"
+            className="whitespace-nowrap font-medium text-slate-700"
+          >
+            Support
+          </a>
+        </nav>
       </header>
 
       <main className="mx-auto grid max-w-7xl gap-12 px-6 py-12 lg:grid-cols-[1.35fr_0.85fr] lg:items-center lg:py-20">
@@ -94,58 +178,94 @@ export default function LandingPage() {
           </span>
 
           <h1 className="mt-5 max-w-2xl font-serif text-4xl font-bold leading-tight text-blue-900 md:text-5xl">
-            Your pathway to admission, guided every step.
+            Your pathway to admission,
+            guided every step.
           </h1>
 
           <p className="mt-5 max-w-2xl leading-7 text-slate-600">
-            A secure, church-affiliated student admissions system
-            designed to synchronize your academic ambitions with
-            ecclesiastical support.
+            A secure, faith-centered
+            admission platform that guides
+            returned missionaries through
+            application review,
+            ecclesiastical endorsement and
+            preparation for the LTC Pioneer
+            Phase.
           </p>
 
-          <div id="process" className="mt-10">
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              to="/admission-process"
+              className="rounded-md bg-blue-900 px-5 py-3 font-semibold text-white transition hover:bg-blue-800"
+            >
+              View Admission Process
+            </Link>
+
+            <Link
+              to="/ltc-guidelines"
+              className="rounded-md border border-blue-900 px-5 py-3 font-semibold text-blue-900 transition hover:bg-blue-50"
+            >
+              Review LTC Guidelines
+            </Link>
+          </div>
+
+          <div
+            id="process"
+            className="mt-10"
+          >
             <h2 className="font-serif text-xl font-bold text-blue-900">
-              The 3-Stage Endorsement Workflow
+              The three-stage review and
+              endorsement workflow
             </h2>
 
             <div className="mt-6 space-y-5">
               <WorkflowStep
                 number="1"
-                title="LTC Admin Review"
-                description="First-stage verification and academic qualification checks."
+                title="LTC Administrative Review"
+                description="The LTC Admissions Team verifies the submitted application and supporting documents."
               />
 
               <WorkflowStep
                 number="2"
-                title="Priesthood Endorsement"
-                description="Interview and spiritual endorsement from your Bishop or Branch President."
+                title="Local Leader Endorsement"
+                description="The applicant is interviewed and endorsed by their Bishop or Branch President."
               />
 
               <WorkflowStep
                 number="3"
                 title="Final Endorsement"
-                description="Concluding interview and review by your Stake or District President."
+                description="The Stake or District President completes the final ecclesiastical review and recommendation."
               />
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-7 shadow-sm">
+        <section
+          id="sign-in"
+          className="scroll-mt-8 rounded-xl border border-slate-200 bg-white p-7 shadow-sm"
+        >
           <h2 className="font-serif text-2xl font-bold text-blue-900">
             Welcome Back
           </h2>
 
           <p className="mt-1 text-sm text-slate-500">
-            Access your application portfolio and status tracker.
+            Sign in to access your
+            application, status updates and
+            assigned portal.
           </p>
 
           {errorMessage && (
-            <div className="mt-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div
+              role="alert"
+              className="mt-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            >
               {errorMessage}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+          <form
+            onSubmit={handleSubmit}
+            className="mt-6 space-y-5"
+          >
             <div>
               <label
                 htmlFor="email"
@@ -160,7 +280,7 @@ export default function LandingPage() {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="student@example.com"
+                placeholder="name@example.com"
                 autoComplete="email"
                 required
                 className="w-full rounded-md border border-slate-300 px-3 py-3 outline-none focus:border-blue-800 focus:ring-2 focus:ring-blue-100"
@@ -189,13 +309,17 @@ export default function LandingPage() {
 
             <div className="flex items-center justify-between gap-4 text-sm">
               <label className="flex items-center gap-2 text-slate-600">
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  className="h-4 w-4"
+                />
+
                 Keep me signed in
               </label>
 
               <Link
                 to="/forgot-password"
-                className="font-medium text-amber-700"
+                className="font-medium text-amber-700 hover:text-amber-800"
               >
                 Forgot Password?
               </Link>
@@ -204,24 +328,28 @@ export default function LandingPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-md bg-blue-900 px-4 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-md bg-blue-900 px-4 py-3 font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {submitting ? 'Signing in...' : 'Sign In'}
+              {submitting
+                ? 'Signing in...'
+                : 'Sign In'}
             </button>
 
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-slate-200" />
+
               <span className="text-xs uppercase text-slate-400">
                 or
               </span>
+
               <div className="h-px flex-1 bg-slate-200" />
             </div>
 
             <Link
               to="/signup"
-              className="block w-full rounded-md border border-blue-800 px-4 py-3 text-center font-semibold text-blue-900"
+              className="block w-full rounded-md border border-blue-800 px-4 py-3 text-center font-semibold text-blue-900 transition hover:bg-blue-50"
             >
-              Get Started with a New Application
+              Start a New Application
             </Link>
           </form>
         </section>
@@ -230,13 +358,32 @@ export default function LandingPage() {
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
           <p>
-            © 2026 Zion-LightApp Admissions. All rights reserved.
+            © {new Date().getFullYear()}{' '}
+            Light Training Center Nigeria.
+            All rights reserved.
           </p>
 
-          <div className="flex gap-6">
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms of Use</Link>
-            <Link to="/support">LTC Support</Link>
+          <div className="flex flex-wrap gap-6">
+            <Link
+              to="/admission-process"
+              className="hover:text-blue-900"
+            >
+              Admission Process
+            </Link>
+
+            <Link
+              to="/ltc-guidelines"
+              className="hover:text-blue-900"
+            >
+              LTC Guidelines
+            </Link>
+
+            <a
+              href="mailto:admission@nigerialtc.org"
+              className="hover:text-blue-900"
+            >
+              LTC Support
+            </a>
           </div>
         </div>
       </footer>
@@ -244,7 +391,11 @@ export default function LandingPage() {
   );
 }
 
-function WorkflowStep({ number, title, description }) {
+function WorkflowStep({
+  number,
+  title,
+  description,
+}) {
   return (
     <div className="flex gap-4">
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-blue-900">
@@ -256,7 +407,7 @@ function WorkflowStep({ number, title, description }) {
           {title}
         </h3>
 
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm leading-6 text-slate-600">
           {description}
         </p>
       </div>

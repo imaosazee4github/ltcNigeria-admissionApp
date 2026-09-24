@@ -1,6 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 
 import LandingPage from "../pages/LandingPage";
+import AdmissionProcessPage from "../pages/public/AdmissionProcessPage";
+import LtcGuidelinesPage from "../pages/public/LtcGuidelinesPage";
 import PlaceholderDashboard from "../pages/PlaceholderDashboard";
 
 import AdmittedStudentsPage from "../pages/admin/AdmittedStudentsPage";
@@ -31,6 +33,7 @@ import LeaderInvitationsPage from "../pages/admin/LeaderInvitationsPage";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import RoleRoute from "../components/common/RoleRoute";
 
+
 function SecureRolePage({ roles, children }) {
   return (
     <ProtectedRoute>
@@ -44,6 +47,8 @@ export default function AppRoutes() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<LandingPage />} />
+       <Route path="/admission-process" element={<AdmissionProcessPage />} />
+      <Route path="/ltc-guidelines" element={<LtcGuidelinesPage />} />
       <Route path="/signup" element={<SignUpPage />} />
 
       <Route
@@ -52,6 +57,8 @@ export default function AppRoutes() {
       />
 
       <Route path="/auth/redirect" element={<AuthRedirectPage />} />
+
+     
 
       {/* Candidate routes */}
       <Route
