@@ -26,11 +26,13 @@ export default function LandingPage() {
     loading,
   } = useAuth();
 
-  const [formData, setFormData] =
-    useState({
-      email: '',
-      password: '',
-    });
+  const [
+    formData,
+    setFormData,
+  ] = useState({
+    email: '',
+    password: '',
+  });
 
   const [
     errorMessage,
@@ -131,12 +133,12 @@ export default function LandingPage() {
               LTC Guidelines
             </Link>
 
-            <a
-              href="mailto:admission@nigerialtc.org"
+            <Link
+              to="/help-support"
               className="text-slate-700 transition hover:text-blue-900"
             >
               Help & Support
-            </a>
+            </Link>
 
             <a
               href="#sign-in"
@@ -162,12 +164,12 @@ export default function LandingPage() {
             LTC Guidelines
           </Link>
 
-          <a
-            href="mailto:admission@nigerialtc.org"
+          <Link
+            to="/help-support"
             className="whitespace-nowrap font-medium text-slate-700"
           >
-            Support
-          </a>
+            Help & Support
+          </Link>
         </nav>
       </header>
 
@@ -205,6 +207,13 @@ export default function LandingPage() {
               className="rounded-md border border-blue-900 px-5 py-3 font-semibold text-blue-900 transition hover:bg-blue-50"
             >
               Review LTC Guidelines
+            </Link>
+
+            <Link
+              to="/help-support"
+              className="rounded-md border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:border-blue-800 hover:bg-blue-50 hover:text-blue-900"
+            >
+              Help & Support
             </Link>
           </div>
 
@@ -351,6 +360,13 @@ export default function LandingPage() {
             >
               Start a New Application
             </Link>
+
+            <Link
+              to="/help-support"
+              className="block text-center text-sm font-medium text-slate-500 transition hover:text-blue-900"
+            >
+              Need help signing in?
+            </Link>
           </form>
         </section>
       </main>
@@ -378,12 +394,12 @@ export default function LandingPage() {
               LTC Guidelines
             </Link>
 
-            <a
-              href="mailto:admission@nigerialtc.org"
+            <Link
+              to="/help-support"
               className="hover:text-blue-900"
             >
-              LTC Support
-            </a>
+              Help & Support
+            </Link>
           </div>
         </div>
       </footer>
