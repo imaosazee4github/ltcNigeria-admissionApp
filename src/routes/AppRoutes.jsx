@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import LandingPage from "../pages/LandingPage";
 import AdmissionProcessPage from "../pages/public/AdmissionProcessPage";
 import LtcGuidelinesPage from "../pages/public/LtcGuidelinesPage";
+import HelpSupportPage from "../pages/public/HelpSupportPage";
 import PlaceholderDashboard from "../pages/PlaceholderDashboard";
 
 import AdmittedStudentsPage from "../pages/admin/AdmittedStudentsPage";
@@ -49,6 +50,7 @@ export default function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
        <Route path="/admission-process" element={<AdmissionProcessPage />} />
       <Route path="/ltc-guidelines" element={<LtcGuidelinesPage />} />
+      <Route path="/help-support" element={<HelpSupportPage />} />
       <Route path="/signup" element={<SignUpPage />} />
 
       <Route
