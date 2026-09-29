@@ -105,3 +105,83 @@ export async function createAreaLeaderInvitation({
 
   return data;
 }
+
+export async function renewAreaLeaderInvitation(
+  invitationId
+) {
+  if (!invitationId) {
+    throw new Error(
+      'The invitation ID is required.'
+    );
+  }
+
+  const { data, error } = await supabase.rpc(
+    'renew_area_leader_invitation',
+    {
+      p_invitation_id: invitationId,
+    }
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data?.token) {
+    throw new Error(
+      'Supabase did not return the renewed invitation token.'
+    );
+  }
+
+  return {
+    ...data,
+
+    invitationUrl:
+      `${window.location.origin}/invitation/${data.token}`,
+  };
+}
+
+export async function revokeAreaLeaderInvitation(
+  invitationId
+) {
+  if (!invitationId) {
+    throw new Error(
+      'The invitation ID is required.'
+    );
+  }
+
+  const { data, error } = await supabase.rpc(
+    'revoke_area_leader_invitation',
+    {
+      p_invitation_id: invitationId,
+    }
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function deleteAreaLeaderInvitation(
+  invitationId
+) {
+  if (!invitationId) {
+    throw new Error(
+      'The invitation ID is required.'
+    );
+  }
+
+  const { data, error } = await supabase.rpc(
+    'delete_area_leader_invitation',
+    {
+      p_invitation_id: invitationId,
+    }
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
