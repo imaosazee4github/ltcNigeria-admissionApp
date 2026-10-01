@@ -138,39 +138,31 @@ export default function DocumentUploadStep({
     }
   }
 
-  function validateRequiredDocuments() {
-    const identityDocument =
-      documents.find((document) => {
-        return (
-          document.document_types?.code ===
-          'identity_document'
-        );
-      });
 
-    if (!identityDocument) {
-      return 'Upload either your NIN document or international passport.';
-    }
+function validateRequiredDocuments() {
+  const identityDocument = documents.find(
+    (document) =>
+      document.document_types?.code === 'identity_document'
+  );
 
-    const isReturnedMissionary =
-      candidateProfile.missionary_status ===
-      'returned_missionary';
-
-    if (isReturnedMissionary) {
-      const missionCertificate =
-        documents.find((document) => {
-          return (
-            document.document_types?.code ===
-            'mission_certificate'
-          );
-        });
-
-      if (!missionCertificate) {
-        return 'Returned missionaries must upload a mission certificate.';
-      }
-    }
-
-    return '';
+  if (!identityDocument) {
+    return 'Upload either your NIN document or international passport.';
   }
+
+  const missingDocument = documentTypes.find(
+    (documentType) =>
+      documentType.is_required &&
+      !getUploadedDocument(documentType.id)
+  );
+
+  if (missingDocument) {
+    return `Upload your ${missingDocument.name}.`;
+  }
+
+  return '';
+}
+
+  
 
   async function handleContinue() {
     const validationError =
