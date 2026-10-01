@@ -11,8 +11,6 @@ export default function CandidateDashboard() {
   const { data, isLoading, isFetching, error, refreshRoomAssignment } =
     useApplication(profile?.id);
 
-  
-
   if (isLoading) {
     return (
       <CandidateLayout>
@@ -26,8 +24,6 @@ export default function CandidateDashboard() {
   const candidateProfile = data?.candidateProfile;
 
   const latestReview = data?.latestReview;
-
-
 
   const roomInformation = data?.roomAssignment || null;
 
@@ -133,6 +129,27 @@ export default function CandidateDashboard() {
                       <h2 className="mt-1 text-2xl font-bold text-blue-900">
                         {data?.intake?.name || "Current Intake"}
                       </h2>
+
+                      <p className="mt-3 text-sm text-slate-600">
+                        Application number:{" "}
+                        {application.application_number || "Pending"}
+                      </p>
+
+                      {[
+                        "admission_completed",
+                        "awaiting_room",
+                        "room_allocated",
+                      ].includes(application.status) && (
+                        <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                            Admission Number
+                          </p>
+
+                          <p className="mt-1 break-words text-xl font-bold text-emerald-900">
+                            {application.admission_number || "Not assigned"}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <ApplicationStatus
@@ -239,8 +256,6 @@ export default function CandidateDashboard() {
                         roomStatus === "allocated" && Boolean(assignedRoom)
                       }
                     />
-
-                  
                   </div>
                 </article>
 
@@ -251,8 +266,6 @@ export default function CandidateDashboard() {
                   refreshing={isFetching}
                   onRefresh={refreshRoomAssignment}
                 />
-
-            
               </section>
             </>
           )}
@@ -318,16 +331,12 @@ function AssignedRoomCard({
   onRefresh,
 }) {
   const admittedStatuses = [
-    'admission_completed',
-    'awaiting_room',
-    'room_allocated',
+    "admission_completed",
+    "awaiting_room",
+    "room_allocated",
   ];
 
-  if (
-    !admittedStatuses.includes(
-      applicationStatus
-    )
-  ) {
+  if (!admittedStatuses.includes(applicationStatus)) {
     return (
       <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-bold text-blue-900">
@@ -335,18 +344,14 @@ function AssignedRoomCard({
         </h2>
 
         <p className="mt-4 text-sm leading-6 text-slate-500">
-          Accommodation information will
-          become available after your
-          admission and Church endorsements
-          are completed.
+          Accommodation information will become available after your admission
+          and Church endorsements are completed.
         </p>
       </article>
     );
   }
 
-  if (
-    roomStatus === 'gender_required'
-  ) {
+  if (roomStatus === "gender_required") {
     return (
       <article className="rounded-xl border border-red-200 bg-red-50 p-6">
         <h2 className="text-xl font-bold text-red-900">
@@ -354,9 +359,8 @@ function AssignedRoomCard({
         </h2>
 
         <p className="mt-3 text-sm leading-6 text-red-800">
-          Your gender information must be
-          completed before the system can
-          assign suitable accommodation.
+          Your gender information must be completed before the system can assign
+          suitable accommodation.
         </p>
 
         <Link
@@ -369,10 +373,7 @@ function AssignedRoomCard({
     );
   }
 
-  if (
-    roomStatus !== 'allocated' ||
-    !assignment
-  ) {
+  if (roomStatus !== "allocated" || !assignment) {
     return (
       <article className="rounded-xl border border-amber-200 bg-amber-50 p-6">
         <div className="flex items-start justify-between gap-4">
@@ -382,10 +383,8 @@ function AssignedRoomCard({
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-amber-800">
-              Your admission is complete.
-              Your room will be assigned
-              automatically or by an LTC
-              Administrator.
+              Your admission is complete. Your room will be assigned
+              automatically or by an LTC Administrator.
             </p>
           </div>
 
@@ -400,9 +399,7 @@ function AssignedRoomCard({
           disabled={refreshing}
           className="mt-5 rounded-lg border border-amber-700 px-4 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {refreshing
-            ? 'Checking...'
-            : 'Check Room Status'}
+          {refreshing ? "Checking..." : "Check Room Status"}
         </button>
       </article>
     );
@@ -434,50 +431,22 @@ function AssignedRoomCard({
 
       <div className="p-6">
         <dl className="grid gap-5 sm:grid-cols-2">
-          <Detail
-            label="Dormitory"
-            value={
-              assignment.house_name
-            }
-          />
+          <Detail label="Dormitory" value={assignment.house_name} />
 
-          <Detail
-            label="Residence"
-            value={
-              assignment.hostel_label
-            }
-          />
+          <Detail label="Residence" value={assignment.hostel_label} />
 
-          <Detail
-            label="Room"
-            value={
-              assignment.room_name
-            }
-          />
+          <Detail label="Room" value={assignment.room_name} />
 
-          <Detail
-            label="Bed Space"
-            value={
-              assignment.bed_label
-            }
-          />
+          <Detail label="Bed Space" value={assignment.bed_label} />
 
           <Detail
             label="Bed Position"
-            value={
-              formatBedPosition(
-                assignment.bed_position
-              )
-            }
+            value={formatBedPosition(assignment.bed_position)}
           />
 
           <Detail
             label="Assigned On"
-            value={
-              formatAssignmentDate(
-                assignment.assigned_at
-              )
-            }
+            value={formatAssignmentDate(assignment.assigned_at)}
           />
         </dl>
 
@@ -487,10 +456,9 @@ function AssignedRoomCard({
           </p>
 
           <p className="mt-1 text-sm text-blue-800">
-            {assignment.assignment_source ===
-            'system'
-              ? 'Automatically assigned by the LTC accommodation system.'
-              : 'Assigned by an LTC Administrator.'}
+            {assignment.assignment_source === "system"
+              ? "Automatically assigned by the LTC accommodation system."
+              : "Assigned by an LTC Administrator."}
           </p>
         </div>
 
@@ -507,16 +475,13 @@ function AssignedRoomCard({
         )}
 
         <p className="mt-5 text-xs leading-5 text-slate-500">
-          Contact the LTC Administration
-          Office if you have questions about
-          this assignment. Candidates cannot
-          change room assignments directly.
+          Contact the LTC Administration Office if you have questions about this
+          assignment. Candidates cannot change room assignments directly.
         </p>
       </div>
     </article>
   );
 }
-
 
 function CorrectionNotice({ latestReview }) {
   return (
@@ -741,29 +706,24 @@ function isAtOrAfter(currentStatus, targetStatus) {
 
 function formatBedPosition(position) {
   if (!position) {
-    return 'Not available';
+    return "Not available";
   }
 
-  return position === 'upper'
-    ? 'Upper Bunk'
-    : 'Lower Bunk';
+  return position === "upper" ? "Upper Bunk" : "Lower Bunk";
 }
 
 function formatAssignmentDate(value) {
   if (!value) {
-    return 'Not available';
+    return "Not available";
   }
 
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return 'Not available';
+    return "Not available";
   }
 
-  return new Intl.DateTimeFormat(
-    'en-NG',
-    {
-      dateStyle: 'medium',
-    }
-  ).format(date);
+  return new Intl.DateTimeFormat("en-NG", {
+    dateStyle: "medium",
+  }).format(date);
 }

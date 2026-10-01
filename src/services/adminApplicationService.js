@@ -1,23 +1,25 @@
-import { supabase } from '../utils/supabase';
+import { supabase } from "../utils/supabase";
 
 export const ADMIN_APPLICATION_STATUSES = [
-  'pending_ltc_review',
-  'correction_required',
-  'pending_local_endorsement',
-  'pending_final_endorsement',
-  'admission_completed',
-  'awaiting_room',
-  'room_allocated',
-  'rejected',
-  'withdrawn',
+  "pending_ltc_review",
+  "correction_required",
+  "pending_local_endorsement",
+  "pending_final_endorsement",
+  "admission_completed",
+  "awaiting_room",
+  "room_allocated",
+  "rejected",
+  "withdrawn",
 ];
 
 export async function getAdminDashboardSummary() {
   const { data, error } = await supabase
-    .from('applications')
-    .select(`
-      id,
+    .from("applications")
+    .select(
+      `id,
       application_number,
+      admission_number,
+      admission_serial,
       status,
       submitted_at,
       completed_at,
@@ -32,12 +34,10 @@ export async function getAdminDashboardSummary() {
         id,
         name
       )
-    `)
-    .in(
-      'status',
-      ADMIN_APPLICATION_STATUSES
+    `,
     )
-    .order('submitted_at', {
+    .in("status", ADMIN_APPLICATION_STATUSES)
+    .order("submitted_at", {
       ascending: false,
       nullsFirst: false,
     });
@@ -49,78 +49,54 @@ export async function getAdminDashboardSummary() {
   const applications = data || [];
 
   function countStatus(status) {
-    return applications.filter(
-      (application) =>
-        application.status === status
-    ).length;
+    return applications.filter((application) => application.status === status)
+      .length;
   }
 
   const admittedStatuses = [
-    'admission_completed',
-    'awaiting_room',
-    'room_allocated',
+    "admission_completed",
+    "awaiting_room",
+    "room_allocated",
   ];
 
   return {
     total: applications.length,
 
-    pendingLtcReview:
-      countStatus(
-        'pending_ltc_review'
-      ),
+    pendingLtcReview: countStatus("pending_ltc_review"),
 
-    correctionRequired:
-      countStatus(
-        'correction_required'
-      ),
+    correctionRequired: countStatus("correction_required"),
 
-    pendingLocalEndorsement:
-      countStatus(
-        'pending_local_endorsement'
-      ),
+    pendingLocalEndorsement: countStatus("pending_local_endorsement"),
 
-    pendingFinalEndorsement:
-      countStatus(
-        'pending_final_endorsement'
-      ),
+    pendingFinalEndorsement: countStatus("pending_final_endorsement"),
 
-    admissionCompleted:
-      countStatus(
-        'admission_completed'
-      ),
+    admissionCompleted: countStatus("admission_completed"),
 
-    awaitingRoom:
-      countStatus(
-        'awaiting_room'
-      ),
+    awaitingRoom: countStatus("awaiting_room"),
 
-    roomAllocated:
-      countStatus(
-        'room_allocated'
-      ),
+    roomAllocated: countStatus("room_allocated"),
 
-    rejected:
-      countStatus('rejected'),
+    rejected: countStatus("rejected"),
 
-    admittedStudents:
-      applications.filter(
-        (application) =>
-          admittedStatuses.includes(
-            application.status
-          )
-      ).length,
+    admittedStudents: applications.filter((application) =>
+      admittedStatuses.includes(application.status),
+    ).length,
 
-    recentApplications:
-      applications.slice(0, 5),
+    recentApplications: applications.slice(0, 5),
   };
 }
 
 export async function getAdminApplicationQueue() {
   const { data, error } = await supabase
-    .from('applications')
-    .select(`
+    .from("applications")
+    .select(
+      `
       id,
       application_number,
+      admission_number,
+      admission_serial,
+      admission_number,
+      admission_serial,
       status,
       completion_percentage,
       current_step,
@@ -146,12 +122,10 @@ export async function getAdminApplicationQueue() {
         id,
         name
       )
-    `)
-    .in(
-      'status',
-      ADMIN_APPLICATION_STATUSES
+    `,
     )
-    .order('submitted_at', {
+    .in("status", ADMIN_APPLICATION_STATUSES)
+    .order("submitted_at", {
       ascending: false,
       nullsFirst: false,
     });
@@ -163,20 +137,19 @@ export async function getAdminApplicationQueue() {
   return data || [];
 }
 
-export async function getAdminApplication(
-  applicationId
-) {
+export async function getAdminApplication(applicationId) {
   if (!applicationId) {
-    throw new Error(
-      'The application ID is required.'
-    );
+    throw new Error("The application ID is required.");
   }
 
   const { data, error } = await supabase
-    .from('applications')
-    .select(`
+    .from("applications")
+    .select(
+      `
       id,
       application_number,
+      admission_number,
+      admission_serial,
       candidate_id,
       intake_id,
       status,
@@ -250,6 +223,7 @@ export async function getAdminApplication(
         original_filename,
         storage_path,
         verification_status,
+        rejection_reason,
         uploaded_at,
 
         document_types (
@@ -275,8 +249,9 @@ export async function getAdminApplication(
         comments,
         created_at
       )
-    `)
-    .eq('id', applicationId)
+    `,
+    )
+    .eq("id", applicationId)
     .single();
 
   if (error) {
@@ -286,22 +261,14 @@ export async function getAdminApplication(
   return data;
 }
 
-export async function createDocumentSignedUrl(
-  storagePath
-) {
+export async function createDocumentSignedUrl(storagePath) {
   if (!storagePath) {
-    throw new Error(
-      'The document storage path is required.'
-    );
+    throw new Error("The document storage path is required.");
   }
 
-  const { data, error } =
-    await supabase.storage
-      .from('candidate-documents')
-      .createSignedUrl(
-        storagePath,
-        60 * 5
-      );
+  const { data, error } = await supabase.storage
+    .from("candidate-documents")
+    .createSignedUrl(storagePath, 60 * 5);
 
   if (error) {
     throw new Error(error.message);
@@ -310,37 +277,46 @@ export async function createDocumentSignedUrl(
   return data.signedUrl;
 }
 
-export async function reviewApplication({
-  applicationId,
-  decision,
-  comments,
-}) {
+export async function reviewApplication({ applicationId, decision, comments }) {
   if (!applicationId) {
-    throw new Error(
-      'The application ID is required.'
-    );
+    throw new Error("The application ID is required.");
   }
 
   if (!decision) {
-    throw new Error(
-      'Select an application decision.'
-    );
+    throw new Error("Select an application decision.");
   }
 
-  const { data, error } =
-    await supabase.rpc(
-      'review_application',
-      {
-        p_application_id:
-          applicationId,
+  const { data, error } = await supabase.rpc("review_application", {
+    p_application_id: applicationId,
 
-        p_decision:
-          decision,
+    p_decision: decision,
 
-        p_comments:
-          comments?.trim() || null,
-      }
-    );
+    p_comments: comments?.trim() || null,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+
+export async function verifyApplicationDocument({
+  documentId,
+  status,
+  storagePath,
+  rejectionReason,
+}) {
+  const { data, error } = await supabase.rpc(
+    'verify_application_document',
+    {
+      p_document_id: documentId,
+      p_status: status,
+      p_storage_path: storagePath,
+      p_rejection_reason: rejectionReason?.trim() || null,
+    }
+  );
 
   if (error) {
     throw new Error(error.message);

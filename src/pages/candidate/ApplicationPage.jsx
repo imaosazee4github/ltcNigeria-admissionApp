@@ -113,10 +113,7 @@ export default function ApplicationPage() {
         updates: formData,
       });
 
-      /*
-       * During a correction, save the information
-       * without changing the application progress.
-       */
+     
       if (
         data.application.status ===
         'correction_required'
