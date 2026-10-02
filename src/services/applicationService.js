@@ -112,6 +112,8 @@ export async function getOrCreateApplication(candidateId, intakeId) {
       `
         id,
         application_number,
+        admission_number,
+        admission_serial,
         candidate_id,
         intake_id,
         status,
