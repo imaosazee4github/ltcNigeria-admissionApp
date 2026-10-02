@@ -242,12 +242,12 @@ export default function FinalEndorsementReviewPage() {
                 }
               />
 
-              <Detail
+              {/* <Detail
                 label="Membership record number"
                 value={
                   application.membership_record_number
                 }
-              />
+              /> */}
 
               <Detail
                 label="Application status"

@@ -314,10 +314,10 @@ function ChurchUnitCard({ candidateProfile }) {
           value={candidateProfile?.local_unit_name}
         />
 
-        <Detail
+        {/* <Detail
           label="Membership number"
           value={candidateProfile?.membership_record_number}
-        />
+        /> */}
       </dl>
     </article>
   );
