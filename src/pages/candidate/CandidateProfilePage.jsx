@@ -442,13 +442,13 @@ export default function CandidateProfilePage() {
                 )}
               />
 
-              <Detail
+              {/* <Detail
                 label="Membership record number"
                 value={
                   candidateProfile
                     ?.membership_record_number
                 }
-              />
+              /> */}
 
               <EditApplicationLink />
             </InformationCard>

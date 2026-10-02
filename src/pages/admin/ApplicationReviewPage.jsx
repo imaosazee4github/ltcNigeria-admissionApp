@@ -236,10 +236,10 @@ export default function ApplicationReviewPage() {
                   value={formatValue(candidate?.local_unit_type)}
                 />
 
-                <InformationItem
+                {/* <InformationItem
                   label="Membership record number"
                   value={candidate?.membership_record_number}
-                />
+                /> */}
 
                 <InformationItem
                   label="Bishop or Branch President"

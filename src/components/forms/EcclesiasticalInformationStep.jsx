@@ -217,7 +217,7 @@ export default function EcclesiasticalInformationStep({
           local_unit_name: formData.local_unit_name,
           local_unit_type: formData.local_unit_type,
           membership_record_number:
-            formData.membership_record_number.trim() || null,
+          formData.membership_record_number.trim() || null,
           local_leader_name: formData.local_leader_name.trim(),
           area_leader_name: formData.area_leader_name.trim(),
           church_unit_verification_status: 'pending',
@@ -256,9 +256,9 @@ export default function EcclesiasticalInformationStep({
           <header className="border-b border-slate-200 pb-6">
             <p className="text-sm font-semibold text-blue-700">Step 2 of 7</p>
             <h1 className="mt-2 text-3xl font-bold text-blue-900">Ecclesiastical Information</h1>
-            <p className="mt-2 text-slate-600">
+            {/* <p className="mt-2 text-slate-600">
               Select the Church unit where your membership record is located.
-            </p>
+            </p> */}
           </header>
 
           {message && <div className="mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-red-700">{message}</div>}
@@ -308,8 +308,8 @@ export default function EcclesiasticalInformationStep({
             </section>
 
             <section className="grid gap-5 border-t border-slate-200 pt-7 md:grid-cols-2">
-              <TextField label="Membership Record Number" name="membership_record_number"
-                value={formData.membership_record_number} onChange={changeText} placeholder="Optional" />
+              {/* <TextField label="Membership Record Number" name="membership_record_number"
+                value={formData.membership_record_number} onChange={changeText} placeholder="Optional" /> */}
               <TextField label={localLeaderLabel} name="local_leader_name"
                 value={formData.local_leader_name} onChange={changeText} required />
               <TextField label={areaLeaderLabel} name="area_leader_name"
