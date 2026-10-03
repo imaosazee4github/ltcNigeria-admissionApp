@@ -274,45 +274,7 @@ export async function initializeCandidateApplication(
   };
 }
 
-// export async function initializeCandidateApplication(
-//   profileId
-// ) {
-//   const intake = await getOpenIntake();
 
-//   if (!intake) {
-//     return {
-//       intake: null,
-//       candidateProfile: null,
-//       application: null,
-//       latestReview: null,
-//     };
-//   }
-
-//   const candidateProfile =
-//     await getOrCreateCandidateProfile(profileId);
-
-//   const application =
-//     await getOrCreateApplication(
-//       candidateProfile.id,
-//       intake.id
-//     );
-
-//   let latestReview = null;
-
-//   if (application) {
-//     latestReview =
-//       await getLatestApplicationReview(
-//         application.id
-//       );
-//   }
-
-//   return {
-//     intake,
-//     candidateProfile,
-//     application,
-//     latestReview,
-//   };
-// }
 
 
 // NEW: Resubmits an application after corrections

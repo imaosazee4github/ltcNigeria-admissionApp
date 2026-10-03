@@ -63,7 +63,7 @@ export default function ApplicationReviewPage() {
     }
   }
 
-  async function handleVerifyDocument(document, status, rejectionReason = "") {
+  async function handleVerifyDocument(document) {
     setDocumentError("");
     setDocumentSuccess("");
     setSavingDocumentId(document.id);
@@ -71,19 +71,14 @@ export default function ApplicationReviewPage() {
     try {
       await verifyApplicationDocument({
         documentId: document.id,
-        status,
+        status: "verified",
         storagePath: document.storage_path,
-        rejectionReason,
       });
 
       // Refresh active queries and mark cached data for refetch.
       await queryClient.invalidateQueries();
 
-      setDocumentSuccess(
-        status === "verified"
-          ? "Document marked as verified."
-          : "Document marked as rejected.",
-      );
+      setDocumentSuccess("Document marked as verified.");
 
       return true;
     } catch (verificationError) {
@@ -327,6 +322,11 @@ export default function ApplicationReviewPage() {
                 </div>
               )}
 
+              {documentSuccess && (
+                <p role="status" className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+                  {documentSuccess}
+                </p>
+              )}
               {documents.length === 0 ? (
                 <p className="text-slate-600">
                   No documents have been uploaded.
@@ -339,6 +339,9 @@ export default function ApplicationReviewPage() {
                       document={document}
                       opening={openingDocumentId === document.id}
                       onOpen={() => handleOpenDocument(document)}
+                      onVerify={() => handleVerifyDocument(document)}
+                      saving={savingDocumentId === document.id}
+                      busy={savingDocumentId !== null}
                     />
                   ))}
                 </div>
@@ -521,30 +524,6 @@ function DocumentRow({
   onOpen,
   onVerify,
 }) {
-  const [showRejection, setShowRejection] = useState(false);
-  const [reason, setReason] = useState('');
-  const [validationError, setValidationError] = useState('');
-
-  async function handleReject(event) {
-    event.preventDefault();
-
-    if (reason.trim().length < 5) {
-      setValidationError(
-        'Provide a rejection reason of at least 5 characters.'
-      );
-      return;
-    }
-
-    setValidationError('');
-
-    const saved = await onVerify('rejected', reason);
-
-    if (saved) {
-      setShowRejection(false);
-      setReason('');
-    }
-  }
-
   return (
     <article className="rounded-xl border border-slate-200 bg-white p-5">
       <div className="flex flex-col justify-between gap-4 sm:flex-row">
@@ -571,18 +550,6 @@ function DocumentRow({
         </div>
       </div>
 
-      {document.verification_status === 'rejected' &&
-        document.rejection_reason && (
-          <div className="mt-4 rounded-lg bg-red-50 p-3">
-            <p className="text-xs font-semibold text-red-700">
-              Rejection reason
-            </p>
-            <p className="mt-1 whitespace-pre-wrap break-words text-sm text-red-700">
-              {document.rejection_reason}
-            </p>
-          </div>
-        )}
-
       <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
         <button
           type="button"
@@ -596,74 +563,14 @@ function DocumentRow({
         <button
           type="button"
           disabled={busy || document.verification_status === 'verified'}
-          onClick={() => onVerify('verified')}
+          onClick={onVerify}
           className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Verify'}
         </button>
 
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => {
-            setShowRejection(true);
-            setReason(document.rejection_reason || '');
-            setValidationError('');
-          }}
-          className="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
-        >
-          Reject
-        </button>
       </div>
 
-      {showRejection && (
-        <form
-          onSubmit={handleReject}
-          className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4"
-        >
-          <label className="block text-sm font-semibold text-slate-800">
-            Rejection reason
-            <textarea
-              value={reason}
-              onChange={(event) => {
-                setReason(event.target.value);
-                setValidationError('');
-              }}
-              rows={4}
-              required
-              maxLength={2000}
-              disabled={busy}
-              placeholder="Explain what is wrong with this document."
-              className="mt-2 block w-full rounded-lg border border-slate-300 bg-white p-3 text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
-            />
-          </label>
-
-          {validationError && (
-            <p role="alert" className="mt-2 text-sm text-red-700">
-              {validationError}
-            </p>
-          )}
-
-          <div className="mt-3 flex gap-2">
-            <button
-              type="submit"
-              disabled={busy}
-              className="rounded-lg bg-red-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-            >
-              {saving ? 'Saving...' : 'Save rejection'}
-            </button>
-
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => setShowRejection(false)}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-600"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
     </article>
   );
 }
