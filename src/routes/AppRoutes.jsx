@@ -4,6 +4,7 @@ import LandingPage from "../pages/LandingPage";
 import AdmissionProcessPage from "../pages/public/AdmissionProcessPage";
 import LtcGuidelinesPage from "../pages/public/LtcGuidelinesPage";
 import HelpSupportPage from "../pages/public/HelpSupportPage";
+import AboutLtcPage from "../pages/public/AboutLtcPage";
 import PlaceholderDashboard from "../pages/PlaceholderDashboard";
 
 import AdmittedStudentsPage from "../pages/admin/AdmittedStudentsPage";
@@ -34,7 +35,6 @@ import LeaderInvitationsPage from "../pages/admin/LeaderInvitationsPage";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import RoleRoute from "../components/common/RoleRoute";
 
-
 function SecureRolePage({ roles, children }) {
   return (
     <ProtectedRoute>
@@ -48,7 +48,8 @@ export default function AppRoutes() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<LandingPage />} />
-       <Route path="/admission-process" element={<AdmissionProcessPage />} />
+      <Route path="/about-ltc" element={<AboutLtcPage />} />
+      <Route path="/admission-process" element={<AdmissionProcessPage />} />
       <Route path="/ltc-guidelines" element={<LtcGuidelinesPage />} />
       <Route path="/help-support" element={<HelpSupportPage />} />
       <Route path="/signup" element={<SignUpPage />} />
@@ -59,8 +60,6 @@ export default function AppRoutes() {
       />
 
       <Route path="/auth/redirect" element={<AuthRedirectPage />} />
-
-     
 
       {/* Candidate routes */}
       <Route
@@ -245,6 +244,7 @@ export default function AppRoutes() {
           </SecureRolePage>
         }
       />
+
       <Route
         path="/admin/rooms"
         element={

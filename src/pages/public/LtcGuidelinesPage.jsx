@@ -382,6 +382,13 @@ function PublicHeader() {
           </Link>
 
           <Link
+            to="/about-ltc"
+            className="text-slate-700 hover:text-blue-900"
+          >
+            About LTC
+          </Link>
+
+          <Link
             to="/ltc-guidelines"
             className="font-semibold text-blue-900"
           >
@@ -417,6 +424,13 @@ function PublicFooter() {
         </p>
 
         <div className="flex gap-5">
+          <Link
+            to="/about-ltc"
+            className="hover:text-blue-900"
+          >
+            About LTC
+          </Link>
+
           <Link
             to="/admission-process"
             className="hover:text-blue-900"
