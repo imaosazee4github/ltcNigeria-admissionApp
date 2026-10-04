@@ -101,7 +101,6 @@ export default function HelpSupportPage() {
     <main className="min-h-screen bg-[#fbfaf7] text-slate-800">
       <PublicHeader />
 
-      {/* Hero */}
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-600">
@@ -123,7 +122,6 @@ export default function HelpSupportPage() {
 
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
         <div className="grid gap-8 lg:grid-cols-[1fr_1.5fr]">
-          {/* Support information */}
           <aside className="space-y-6">
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:p-8">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl font-bold text-blue-900">
@@ -189,11 +187,17 @@ export default function HelpSupportPage() {
                 >
                   View LTC Guidelines
                 </Link>
+
+                <Link
+                  to="/about-ltc"
+                  className="rounded-xl border border-blue-700 bg-blue-900 px-4 py-3 font-semibold transition hover:bg-blue-800"
+                >
+                  Learn About LTC
+                </Link>
               </div>
             </section>
           </aside>
 
-          {/* Support form */}
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:p-8">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.16em] text-amber-600">
@@ -342,7 +346,6 @@ export default function HelpSupportPage() {
         </div>
       </div>
 
-      {/* CTA */}
       <section className="bg-blue-950">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-12 text-white lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div>
@@ -376,7 +379,6 @@ export default function HelpSupportPage() {
 
       <PublicFooter />
 
-      {/* Floating contact buttons */}
       <FloatingContactButtons />
     </main>
   );
@@ -439,7 +441,6 @@ function FloatingContactButtons() {
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
-      {/* Email */}
       <a
         href={emailUrl}
         aria-label="Email LTC Admissions"
@@ -449,7 +450,6 @@ function FloatingContactButtons() {
         <MailIcon />
       </a>
 
-      {/* WhatsApp */}
       <a
         href={WHATSAPP_URL}
         target="_blank"
@@ -534,6 +534,13 @@ function PublicHeader() {
           </Link>
 
           <Link
+            to="/about-ltc"
+            className="text-slate-700 transition hover:text-blue-900"
+          >
+            About LTC
+          </Link>
+
+          <Link
             to="/ltc-guidelines"
             className="text-slate-700 transition hover:text-blue-900"
           >
@@ -576,6 +583,13 @@ function PublicFooter() {
         </p>
 
         <div className="flex flex-wrap gap-5">
+          <Link
+            to="/about-ltc"
+            className="transition hover:text-blue-900"
+          >
+            About LTC
+          </Link>
+
           <Link
             to="/admission-process"
             className="transition hover:text-blue-900"
