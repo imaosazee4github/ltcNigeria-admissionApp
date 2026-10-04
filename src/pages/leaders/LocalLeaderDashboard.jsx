@@ -205,12 +205,12 @@ function CandidateQueueItem({ application, onReview }) {
             </strong>
           </p>
 
-          <p>
+          {/* <p>
             Membership number:{" "}
             <strong className="text-slate-800">
               {application.membership_record_number || "Not provided"}
             </strong>
-          </p>
+          </p> */}
         </div>
       </div>
 

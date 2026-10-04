@@ -151,3 +151,83 @@ export async function createLocalLeaderInvitation({
 
   return data;
 }
+
+export async function renewLocalLeaderInvitation(
+  invitationId
+) {
+  if (!invitationId) {
+    throw new Error(
+      'The invitation ID is required.'
+    );
+  }
+
+  const { data, error } = await supabase.rpc(
+    'renew_local_leader_invitation',
+    {
+      p_invitation_id: invitationId,
+    }
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data?.token) {
+    throw new Error(
+      'Supabase did not return the renewed invitation token.'
+    );
+  }
+
+  return {
+    ...data,
+
+    invitationUrl:
+      `${window.location.origin}/invitation/${data.token}`,
+  };
+}
+
+export async function revokeLocalLeaderInvitation(
+  invitationId
+) {
+  if (!invitationId) {
+    throw new Error(
+      'The invitation ID is required.'
+    );
+  }
+
+  const { data, error } = await supabase.rpc(
+    'revoke_local_leader_invitation',
+    {
+      p_invitation_id: invitationId,
+    }
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function deleteLocalLeaderInvitation(
+  invitationId
+) {
+  if (!invitationId) {
+    throw new Error(
+      'The invitation ID is required.'
+    );
+  }
+
+  const { data, error } = await supabase.rpc(
+    'delete_local_leader_invitation',
+    {
+      p_invitation_id: invitationId,
+    }
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
