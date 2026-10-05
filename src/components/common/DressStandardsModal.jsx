@@ -1,40 +1,62 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function DressStandardsModal({ open, onClose }) {
+export default function DressStandardsModal({
+  open,
+  onClose,
+}) {
   const dialogRef = useRef(null);
-  const [imageFailed, setImageFailed] = useState(false);
+  const [imageFailed, setImageFailed] =
+    useState(false);
 
-
-
-  const posterUrl = `${import.meta.env.BASE_URL}images/ltc-dress-standards.png`;
-
- 
+  const posterUrl =
+    `${import.meta.env.BASE_URL}images/ltc-dress-standards.png`;
 
   useEffect(() => {
     const dialog = dialogRef.current;
 
     if (!dialog) {
-      return;
+      return undefined;
     }
 
-    if (open) {
-      if (!dialog.open) {
-        dialog.showModal();
-      }
-
-      document.body.style.overflow = "hidden";
-    } else {
+    if (!open) {
       if (dialog.open) {
         dialog.close();
       }
 
-      document.body.style.overflow = "";
+      return undefined;
+    }
+
+    setImageFailed(false);
+
+    const previousFocus =
+      document.activeElement;
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow =
+      "hidden";
+
+    if (!dialog.open) {
+      dialog.showModal();
     }
 
     return () => {
-      document.body.style.overflow = "";
+      if (dialog.open) {
+        dialog.close();
+      }
+
+      document.body.style.overflow =
+        previousOverflow;
+
+      if (
+        previousFocus instanceof HTMLElement
+      ) {
+        previousFocus.focus();
+      }
     };
   }, [open]);
+
   return (
     <dialog
       ref={dialogRef}
@@ -51,6 +73,7 @@ export default function DressStandardsModal({ open, onClose }) {
             <p className="text-sm font-semibold uppercase tracking-wider text-amber-600">
               LTC Nigeria
             </p>
+
             <h2
               id="dress-standards-title"
               className="mt-1 text-2xl font-bold text-blue-900"
@@ -58,6 +81,7 @@ export default function DressStandardsModal({ open, onClose }) {
               Dress and Grooming Standards
             </h2>
           </div>
+
           <button
             type="button"
             onClick={onClose}
@@ -67,27 +91,38 @@ export default function DressStandardsModal({ open, onClose }) {
             ×
           </button>
         </header>
+
         <div className="overflow-y-auto p-5 md:p-7">
           <p>
-            All clothing should be modest, neat, clean, and appropriate for a
+            All clothing should be modest,
+            neat, clean, and appropriate for a
             learning and spiritual environment.
           </p>
+
           <figure className="mt-5 overflow-hidden rounded-lg border border-slate-200">
             {!imageFailed ? (
               <img
                 src={posterUrl}
                 alt="LTC student dress standards poster showing examples of Church, classroom, sports, cultural, casual campus and construction attire."
                 className="h-auto w-full"
-                onError={() => setImageFailed(true)}
+                onError={() =>
+                  setImageFailed(true)
+                }
               />
             ) : (
-              <p role="status" className="p-5">
-                The illustrated guide could not load. Please close this window
+              <p
+                role="status"
+                className="p-5"
+              >
+                The illustrated guide could not
+                load. Please close this window
                 and try again.
               </p>
             )}
+
             <figcaption className="border-t border-slate-200 p-3 text-sm text-slate-600">
-              Illustrated LTC student dress standards.{" "}
+              Illustrated LTC student dress
+              standards.{" "}
               <a
                 href={posterUrl}
                 target="_blank"
@@ -98,28 +133,44 @@ export default function DressStandardsModal({ open, onClose }) {
               </a>
             </figcaption>
           </figure>
+
           <div className="mt-7 rounded-lg bg-blue-50 p-5">
-            <h3 className="font-bold text-blue-900">Important Reminders</h3>
+            <h3 className="font-bold text-blue-900">
+              Important Reminders
+            </h3>
+
             <ul className="mt-2 list-disc space-y-2 pl-6">
               <li>
-                Dress standards reflect the values of the Light Training Center
-                (LTC).
+                Dress standards reflect the
+                values of the Light Training
+                Center (LTC).
               </li>
+
               <li>
-                We are here to learn, serve and prepare the next generation for
+                We are here to learn, serve and
+                prepare the next generation for
                 future missionaries.
               </li>
-              <li>When in doubt, choose what is modest and respectful.</li>
+
               <li>
-                Cleanliness reflects your respect for yourself and others.
+                When in doubt, choose what is
+                modest and respectful.
               </li>
+
               <li>
-                The LTC community is a place of growth, learning, and mutual
+                Cleanliness reflects your
+                respect for yourself and others.
+              </li>
+
+              <li>
+                The LTC community is a place of
+                growth, learning, and mutual
                 respect.
               </li>
             </ul>
           </div>
         </div>
+
         <footer className="flex justify-end border-t border-slate-200 p-5">
           <button
             type="button"
