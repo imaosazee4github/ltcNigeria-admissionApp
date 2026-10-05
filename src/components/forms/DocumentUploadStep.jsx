@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useDocuments } from '../../hooks/useDocuments';
+import { useDocuments } from "../../hooks/useDocuments";
 
 export default function DocumentUploadStep({
   user,
@@ -24,89 +24,67 @@ export default function DocumentUploadStep({
 
   const fileInputRefs = useRef({});
 
-  const [identityType, setIdentityType] =
-    useState('nin');
+  const [identityType, setIdentityType] = useState("nin");
 
-  const [activeUpload, setActiveUpload] =
-    useState('');
+  const [activeUpload, setActiveUpload] = useState("");
 
-  const [openMenu, setOpenMenu] =
-    useState('');
+  const [openMenu, setOpenMenu] = useState("");
 
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] =
-    useState('');
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
   function getUploadedDocument(documentTypeId) {
     return documents.find((document) => {
-      return (
-        document.document_type_id ===
-        documentTypeId
-      );
+      return document.document_type_id === documentTypeId;
     });
   }
 
   async function handleUpload(documentType, file) {
     if (!file) {
-      setMessage(
-        `Select a file for ${documentType.name}.`
-      );
-      setMessageType('error');
+      setMessage(`Select a file for ${documentType.name}.`);
+      setMessageType("error");
       return;
     }
 
     try {
       setActiveUpload(documentType.id);
-      setMessage('');
-      setMessageType('');
+      setMessage("");
+      setMessageType("");
 
       await uploadDocument({
         userId: user.id,
         applicationId: application.id,
         documentType,
         documentSubtype:
-          documentType.code ===
-          'identity_document'
-            ? identityType
-            : null,
+          documentType.code === "identity_document" ? identityType : null,
         file,
       });
 
-      setMessage(
-        `${documentType.name} uploaded successfully.`
-      );
-      setMessageType('success');
+      setMessage(`${documentType.name} uploaded successfully.`);
+      setMessageType("success");
     } catch (uploadError) {
       setMessage(uploadError.message);
-      setMessageType('error');
+      setMessageType("error");
     } finally {
-      setActiveUpload('');
+      setActiveUpload("");
 
-      const input =
-        fileInputRefs.current[documentType.id];
+      const input = fileInputRefs.current[documentType.id];
 
       if (input) {
-        input.value = '';
+        input.value = "";
       }
     }
   }
 
-  async function handleFileChange(
-    documentType,
-    file
-  ) {
+  async function handleFileChange(documentType, file) {
     if (!file) return;
 
-    setOpenMenu('');
+    setOpenMenu("");
     await handleUpload(documentType, file);
   }
 
   function openFilePicker(documentTypeId) {
-    if (
-      uploading ||
-      deleting ||
-      application.status !== 'draft'
-    ) {
+    if (uploading || deleting || application.status !== "draft") {
       return;
     }
 
@@ -114,63 +92,55 @@ export default function DocumentUploadStep({
   }
 
   async function handleDelete(document) {
-    const confirmed = window.confirm(
-      `Delete ${document.original_filename}?`
-    );
+    const confirmed = window.confirm(`Delete ${document.original_filename}?`);
 
     if (!confirmed) {
       return;
     }
 
     try {
-      setMessage('');
-      setMessageType('');
+      setMessage("");
+      setMessageType("");
 
       await deleteDocument(document);
 
-      setOpenMenu('');
+      setOpenMenu("");
 
-      setMessage('Document deleted successfully.');
-      setMessageType('success');
+      setMessage("Document deleted successfully.");
+      setMessageType("success");
     } catch (deleteError) {
       setMessage(deleteError.message);
-      setMessageType('error');
+      setMessageType("error");
     }
   }
 
+  function validateRequiredDocuments() {
+    const identityDocument = documents.find(
+      (document) => document.document_types?.code === "identity_document",
+    );
 
-function validateRequiredDocuments() {
-  const identityDocument = documents.find(
-    (document) =>
-      document.document_types?.code === 'identity_document'
-  );
+    if (!identityDocument) {
+      return "Upload either your NIN document or international passport.";
+    }
 
-  if (!identityDocument) {
-    return 'Upload either your NIN document or international passport.';
+    const missingDocument = documentTypes.find(
+      (documentType) =>
+        documentType.is_required && !getUploadedDocument(documentType.id),
+    );
+
+    if (missingDocument) {
+      return `Upload your ${missingDocument.name}.`;
+    }
+
+    return "";
   }
-
-  const missingDocument = documentTypes.find(
-    (documentType) =>
-      documentType.is_required &&
-      !getUploadedDocument(documentType.id)
-  );
-
-  if (missingDocument) {
-    return `Upload your ${missingDocument.name}.`;
-  }
-
-  return '';
-}
-
-  
 
   async function handleContinue() {
-    const validationError =
-      validateRequiredDocuments();
+    const validationError = validateRequiredDocuments();
 
     if (validationError) {
       setMessage(validationError);
-      setMessageType('error');
+      setMessageType("error");
       return;
     }
 
@@ -181,26 +151,19 @@ function validateRequiredDocuments() {
         completionPercentage: 90,
       });
 
-      navigate('/candidate/dashboard');
+      navigate("/candidate/dashboard");
     } catch (progressError) {
       setMessage(progressError.message);
-      setMessageType('error');
+      setMessageType("error");
     }
   }
 
   if (loading) {
-    return (
-      <PageMessage message="Loading document requirements..." />
-    );
+    return <PageMessage message="Loading document requirements..." />;
   }
 
   if (error) {
-    return (
-      <PageMessage
-        error
-        message={error.message}
-      />
-    );
+    return <PageMessage error message={error.message} />;
   }
 
   return (
@@ -208,9 +171,7 @@ function validateRequiredDocuments() {
       <div className="mx-auto max-w-5xl">
         <button
           type="button"
-          onClick={() =>
-            navigate('/candidate/dashboard')
-          }
+          onClick={() => navigate("/candidate/dashboard")}
           className="font-medium text-blue-900"
         >
           ← Return to dashboard
@@ -218,26 +179,30 @@ function validateRequiredDocuments() {
 
         <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
           <header className="border-b border-slate-200 pb-6">
-            <p className="text-sm font-semibold text-blue-700">
-              Step 6 of 7
-            </p>
+            <p className="text-sm font-semibold text-blue-700">Step 6 of 7</p>
 
             <h1 className="mt-2 text-3xl font-bold text-blue-900">
               Document Upload
             </h1>
-
             <p className="mt-2 text-slate-600">
-              Upload PDF, JPG or PNG files. Each file must
-              be 5 MB or smaller.
+              All four documents are required to complete your application.
+              Upload PDF, JPG or PNG files, each 5 MB or smaller.
             </p>
+
+            <p className="mt-2 text-sm text-slate-600">
+              <span className="font-bold text-red-600">*</span> indicates a
+              required document. For identification, upload either your NIN
+              document or international passport—not both.
+            </p>
+
           </header>
 
           {message && (
             <div
               className={
-                messageType === 'success'
-                  ? 'mt-6 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-700'
-                  : 'mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700'
+                messageType === "success"
+                  ? "mt-6 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-700"
+                  : "mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700"
               }
             >
               {message}
@@ -246,14 +211,10 @@ function validateRequiredDocuments() {
 
           <div className="mt-7 space-y-5">
             {documentTypes.map((documentType) => {
-              const uploaded =
-                getUploadedDocument(
-                  documentType.id
-                );
+              const uploaded = getUploadedDocument(documentType.id);
 
               const isUploadingThis =
-                uploading &&
-                activeUpload === documentType.id;
+                uploading && activeUpload === documentType.id;
 
               return (
                 <article
@@ -266,9 +227,7 @@ function validateRequiredDocuments() {
                         {documentType.name}
 
                         {documentType.is_required && (
-                          <span className="ml-1 text-red-600">
-                            *
-                          </span>
+                          <span className="ml-1 text-red-600">*</span>
                         )}
                       </h2>
 
@@ -284,8 +243,7 @@ function validateRequiredDocuments() {
                     )}
                   </div>
 
-                  {documentType.code ===
-                    'identity_document' && (
+                  {documentType.code === "identity_document" && (
                     <div className="mt-5">
                       <label
                         htmlFor="identity-type"
@@ -298,15 +256,11 @@ function validateRequiredDocuments() {
                         id="identity-type"
                         value={identityType}
                         onChange={(event) =>
-                          setIdentityType(
-                            event.target.value
-                          )
+                          setIdentityType(event.target.value)
                         }
                         className="w-full rounded-md border border-slate-300 bg-white px-3 py-3 md:max-w-md"
                       >
-                        <option value="nin">
-                          NIN
-                        </option>
+                        <option value="nin">NIN</option>
 
                         <option value="international_passport">
                           International Passport
@@ -317,23 +271,21 @@ function validateRequiredDocuments() {
 
                   <input
                     ref={(element) => {
-                      fileInputRefs.current[
-                        documentType.id
-                      ] = element;
+                      fileInputRefs.current[documentType.id] = element;
                     }}
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
                     onChange={(event) =>
                       handleFileChange(
                         documentType,
-                        event.target.files?.[0] || null
+                        event.target.files?.[0] || null,
                       )
                     }
                     className="sr-only"
                     disabled={
                       isUploadingThis ||
                       deleting ||
-                      application.status !== 'draft'
+                      application.status !== "draft"
                     }
                   />
 
@@ -341,13 +293,11 @@ function validateRequiredDocuments() {
                     <div className="relative mt-5">
                       <button
                         type="button"
-                        onClick={() =>
-                          openFilePicker(documentType.id)
-                        }
+                        onClick={() => openFilePicker(documentType.id)}
                         disabled={
                           isUploadingThis ||
                           deleting ||
-                          application.status !== 'draft'
+                          application.status !== "draft"
                         }
                         aria-label={`Change ${documentType.name}`}
                         className="group flex w-full items-center gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 pr-14 text-left transition hover:border-blue-300 hover:bg-blue-50/50 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
@@ -355,9 +305,9 @@ function validateRequiredDocuments() {
                         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white text-xl shadow-sm">
                           {uploaded.original_filename
                             ?.toLowerCase()
-                            .endsWith('.pdf')
-                            ? 'PDF'
-                            : 'IMG'}
+                            .endsWith(".pdf")
+                            ? "PDF"
+                            : "IMG"}
                         </span>
 
                         <span className="min-w-0 flex-1">
@@ -367,9 +317,9 @@ function validateRequiredDocuments() {
 
                           <span className="mt-1 block text-xs text-slate-500">
                             {isUploadingThis
-                              ? 'Uploading new document...'
+                              ? "Uploading new document..."
                               : `Status: ${formatStatus(
-                                  uploaded.verification_status
+                                  uploaded.verification_status,
                                 )}`}
                           </span>
 
@@ -382,20 +332,16 @@ function validateRequiredDocuments() {
                       <button
                         type="button"
                         aria-label={`More options for ${documentType.name}`}
-                        aria-expanded={
-                          openMenu === documentType.id
-                        }
+                        aria-expanded={openMenu === documentType.id}
                         onClick={() =>
                           setOpenMenu((current) =>
-                            current === documentType.id
-                              ? ''
-                              : documentType.id
+                            current === documentType.id ? "" : documentType.id,
                           )
                         }
                         disabled={
                           isUploadingThis ||
                           deleting ||
-                          application.status !== 'draft'
+                          application.status !== "draft"
                         }
                         className="absolute right-3 top-3 rounded-md px-3 py-2 text-xl font-bold leading-none text-slate-500 hover:bg-white hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-700 disabled:opacity-50"
                       >
@@ -406,15 +352,11 @@ function validateRequiredDocuments() {
                         <div className="absolute right-3 top-12 z-10 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
                           <button
                             type="button"
-                            onClick={() =>
-                              handleDelete(uploaded)
-                            }
+                            onClick={() => handleDelete(uploaded)}
                             disabled={deleting}
                             className="w-full rounded-md px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
                           >
-                            {deleting
-                              ? 'Deleting...'
-                              : 'Delete document'}
+                            {deleting ? "Deleting..." : "Delete document"}
                           </button>
                         </div>
                       )}
@@ -428,20 +370,18 @@ function validateRequiredDocuments() {
                   ) : (
                     <button
                       type="button"
-                      onClick={() =>
-                        openFilePicker(documentType.id)
-                      }
+                      onClick={() => openFilePicker(documentType.id)}
                       disabled={
                         isUploadingThis ||
                         deleting ||
-                        application.status !== 'draft'
+                        application.status !== "draft"
                       }
                       className="mt-5 flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 px-5 py-8 text-center transition hover:border-blue-400 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <span className="text-sm font-semibold text-blue-900">
                         {isUploadingThis
-                          ? 'Uploading document...'
-                          : 'Choose a document'}
+                          ? "Uploading document..."
+                          : "Choose a document"}
                       </span>
 
                       <span className="mt-1 text-xs text-slate-500">
@@ -457,9 +397,7 @@ function validateRequiredDocuments() {
           <div className="mt-8 flex flex-col-reverse justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
             <button
               type="button"
-              onClick={() =>
-                navigate('/candidate/dashboard')
-              }
+              onClick={() => navigate("/candidate/dashboard")}
               className="rounded-md border border-slate-300 px-6 py-3 font-semibold text-slate-700"
             >
               Save and Exit
@@ -482,27 +420,21 @@ function validateRequiredDocuments() {
 
 function formatStatus(status) {
   return status
-    .split('_')
+    .split("_")
     .map((word) => {
-      return (
-        word.charAt(0).toUpperCase() +
-        word.slice(1)
-      );
+      return word.charAt(0).toUpperCase() + word.slice(1);
     })
-    .join(' ');
+    .join(" ");
 }
 
-function PageMessage({
-  message,
-  error = false,
-}) {
+function PageMessage({ message, error = false }) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
       <div
         className={
           error
-            ? 'rounded-lg bg-red-50 p-5 text-red-700'
-            : 'rounded-lg bg-white p-5 text-slate-600 shadow'
+            ? "rounded-lg bg-red-50 p-5 text-red-700"
+            : "rounded-lg bg-white p-5 text-slate-600 shadow"
         }
       >
         {message}
