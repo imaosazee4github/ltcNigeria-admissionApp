@@ -11,7 +11,7 @@ const HONOR_STANDARDS = [
     ],
   ],
   [
-    "2. Chastity and Virtue",
+    "2. Chastity & Virtue",
     [
       "As unmarried students, we practice sexual abstinence.",
       "We avoid pornography and media that promote immorality, profanity, or violence.",
@@ -30,90 +30,18 @@ const HONOR_STANDARDS = [
     [
       "We treat ourselves with dignity and respect.",
       "We abstain from alcohol, tobacco, and other harmful substances.",
-      "We do not use illegal drugs, abuse medications, or self-medicate without consent from the LTC clinic.",
+      "We do not use illegal drugs and substances, abuse medications, or self-medicate without consent from the LTC clinic.",
     ],
   ],
   [
     "5. Respect for Others",
     [
-      "We show respect for all individuals, their property, and LTC facilities.",
+      "We show respect for all individuals, their property, and for LTC facilities.",
       "We avoid behavior that disrupts the peace, safety, or unity of the community.",
-      "We seek to be peacemakers and to uplift and support others.",
-    ],
-  ],
-];
-
-// Readable companion text based on the supplied LTC dress standards poster.
-const DRESS_STANDARDS = [
-  [
-    "Church Attendance",
-    [
-      "Male students: white long-sleeve shirt, tie, dark trousers, black belt, and black dress shoes. A suit coat is permitted.",
-      "Female students: modest dress or blouse with a skirt below the knee, with closed-toe or modest dress shoes.",
-    ],
-  ],
-  [
-    "Classroom Attire",
-    [
-      "Smart, neat and modest clothing suitable for a professional learning environment.",
-      "Examples include nice tops, trousers, skirts below the knee, sweaters, and closed shoes.",
-    ],
-  ],
-  [
-    "Sports Attire",
-    [
-      "Modest sports T-shirts.",
-      "Athletic trousers or track pants; shorts must follow the separate modest shorts guidance.",
-      "Appropriate athletic shoes.",
-    ],
-  ],
-  [
-    "Modest Shorts for Sports and Recreational Activities",
-    [
-      "Shorts must be knee-length, loose and modest.",
-      "Shorts must not be tight or short.",
-    ],
-  ],
-  [
-    "Cultural Attire",
-    [
-      "Traditional attire that reflects the culture and modesty.",
-      "Appropriate for approved cultural events.",
-    ],
-  ],
-  [
-    "Casual Campus Attire",
-    [
-      "Modest polo shirts, T-shirts, or casual shirts with long trousers or skirts below the knee.",
-      "Appropriate casual shoes or sneakers.",
-    ],
-  ],
-  [
-    "Other Guidelines",
-    [
-      "Clothing should be neat, clean, well-fitting, and modest.",
-      "No short skirts, tank tops, sleeveless tops, or clothing with inappropriate graphics or words.",
-      "Always wear appropriate footwear, such as closed shoes or athletic shoes.",
-      "Maintain good grooming and personal hygiene.",
-      "Follow the dress standards at all times, including during Church, classes, activities, and on campus.",
-    ],
-  ],
-  [
-    "Examples of Unacceptable Attire",
-    [
-      "Clothing that is tight, revealing, too short, or fitted inappropriately.",
-      "Shirts with offensive graphics, and shorts or skirts above the knee.",
-    ],
-  ],
-  [
-    "Construction Work-Site Attire",
-    [
-      "Wear a hard hat or helmet at all times.",
-      "Wear a reflective safety vest for visibility and safety.",
-      "Wear long work trousers and durable clothing.",
-      "Wear safety boots with good grip and protection.",
-      "Wear gloves when required for specific tasks.",
-      "Always follow site safety rules and instructions.",
+      "We seek to be peacemakers, to uplift and support others.",
+      "You will engage from time to time in outside community service projects.",
+      "At all times, you will be an ambassador for the LTC and the Church, knowing that there are very few members of the Church surrounding the LTC.",
+      "We look to you to be an example of Christ, positive and respectful at all times when engaging with these wonderful neighbors and friends.",
     ],
   ],
 ];
@@ -124,19 +52,40 @@ export default function HonorCodeModal({ open, onClose, onReviewed }) {
 
   useEffect(() => {
     const dialog = dialogRef.current;
-    if (!open) {
-      setDressOpen(false);
-      if (dialog.open) dialog.close();
+
+    if (!dialog) {
       return undefined;
     }
+
+    if (!open) {
+      setDressOpen(false);
+
+      if (dialog.open) {
+        dialog.close();
+      }
+
+      return undefined;
+    }
+
     const previousFocus = document.activeElement;
     const previousOverflow = document.body.style.overflow;
+
     document.body.style.overflow = "hidden";
-    if (!dialog.open) dialog.showModal();
+
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+
     return () => {
-      if (dialog.open) dialog.close();
+      if (dialog.open) {
+        dialog.close();
+      }
+
       document.body.style.overflow = previousOverflow;
-      if (previousFocus instanceof HTMLElement) previousFocus.focus();
+
+      if (previousFocus instanceof HTMLElement) {
+        previousFocus.focus();
+      }
     };
   }, [open]);
 
@@ -162,13 +111,15 @@ export default function HonorCodeModal({ open, onClose, onReviewed }) {
               <p className="text-sm font-semibold uppercase tracking-wider text-amber-600">
                 LTC Nigeria
               </p>
+
               <h2
                 id="honor-code-title"
                 className="mt-1 text-2xl font-bold text-blue-900"
               >
-                Student Honor Code and Dress and Grooming Standards
+                LTC Nigeria Student Honor Code
               </h2>
             </div>
+
             <button
               type="button"
               onClick={onClose}
@@ -178,18 +129,22 @@ export default function HonorCodeModal({ open, onClose, onReviewed }) {
               ×
             </button>
           </header>
+
           <div className="overflow-y-auto p-5 md:p-7">
-            <p>
+            <p className="leading-7">
               Students of the Light Training Center (LTC) commit to living
               honest, chaste, and virtuous lives; obeying the law; and showing
               respect for themselves and others.
             </p>
-            <p className="mt-3">
-              Conduct must be consistent with the standards of The Church of
-              Jesus Christ of Latter-day Saints and reflect the LTC core values
-              of:
+
+            <p className="mt-4 leading-7">
+              LTC is a faith-centered learning environment based upon the
+              teachings of The Church of Jesus Christ of Latter-day Saints.
+              Students are expected to conduct themselves in a manner
+              consistent with those teachings and with the LTC core values of:
             </p>
-            <ul className="mt-3 grid list-disc gap-1 pl-6 sm:grid-cols-2">
+
+            <ul className="mt-4 grid list-disc gap-2 pl-6 sm:grid-cols-2">
               {[
                 "Service",
                 "Discipleship",
@@ -202,30 +157,38 @@ export default function HonorCodeModal({ open, onClose, onReviewed }) {
                 <li key={value}>{value}</li>
               ))}
             </ul>
-            <p className="mt-4 font-semibold">
+
+            <p className="mt-5 font-semibold leading-7">
               Students agree to abide by this Code for the entire duration of
-              their enrollment at LTC.
+              their enrollment at the LTC.
             </p>
+
             {HONOR_STANDARDS.map(([title, items]) => (
               <Standard key={title} title={title} items={items} />
             ))}
-            <section className="mt-7 rounded-lg bg-blue-50 p-5">
+
+            <section className="mt-8 rounded-lg bg-blue-50 p-5">
               <h3 className="text-lg font-bold text-blue-900">
-                6. Dress and Grooming Standards
+                DRESS AND GROOMING STANDARDS
               </h3>
-              <p className="mt-2">
-                Students are expected to maintain dress and grooming that is:
+
+              <p className="mt-2 leading-7">
+                Students are expected to maintain a standard of dress and
+                grooming that is:
               </p>
-              <ul className="mt-2 list-disc space-y-1 pl-6">
+
+              <ul className="mt-3 list-disc space-y-1 pl-6">
                 <li>Clean</li>
                 <li>Modest</li>
                 <li>Respectful</li>
                 <li>Appropriate for the occasion</li>
               </ul>
-              <p className="mt-4 text-sm">
+
+              <p className="mt-4 text-sm leading-6">
                 View the illustrated guide and detailed standards for Church,
-                classes, campus activities and work sites.
+                classes, campus activities, and work sites.
               </p>
+
               <button
                 type="button"
                 onClick={() => setDressOpen(true)}
@@ -235,7 +198,30 @@ export default function HonorCodeModal({ open, onClose, onReviewed }) {
                 View Dress and Grooming Standards
               </button>
             </section>
+
+            {/* <section className="mt-8 rounded-lg border border-slate-200 bg-white p-5">
+              <h3 className="text-lg font-bold text-blue-900">
+                STUDENT PLEDGE
+              </h3>
+
+              <p className="mt-4 leading-7">
+                I,{" "}
+                <span className="inline-block min-w-56 border-b border-slate-400">
+                  &nbsp;
+                </span>
+                , declare that I have read, understand, and agree to abide by
+                the LTC – Nigeria Code of Honor and Dress and Grooming
+                Standards.
+              </p>
+
+              <p className="mt-4 leading-7">
+                I also authorize my ecclesiastical leader to provide relevant
+                information regarding my personal conduct as part of the
+                admissions process.
+              </p>
+            </section> */}
           </div>
+
           <footer className="flex flex-col-reverse gap-3 border-t border-slate-200 p-5 sm:flex-row sm:justify-end">
             <button
               type="button"
@@ -244,6 +230,7 @@ export default function HonorCodeModal({ open, onClose, onReviewed }) {
             >
               Close
             </button>
+
             <button
               type="button"
               onClick={confirmReview}
@@ -254,6 +241,7 @@ export default function HonorCodeModal({ open, onClose, onReviewed }) {
           </footer>
         </div>
       </dialog>
+
       <DressStandardsModal
         open={dressOpen}
         onClose={() => setDressOpen(false)}
@@ -262,12 +250,12 @@ export default function HonorCodeModal({ open, onClose, onReviewed }) {
   );
 }
 
-
 function Standard({ title, items }) {
   return (
-    <section className="mt-7">
+    <section className="mt-8">
       <h3 className="text-lg font-bold text-blue-900">{title}</h3>
-      <ul className="mt-2 list-disc space-y-2 pl-6">
+
+      <ul className="mt-3 list-disc space-y-2 pl-6 leading-7">
         {items.map((item) => (
           <li key={item}>{item}</li>
         ))}
