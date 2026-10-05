@@ -1,34 +1,57 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
-export default function DressStandardsModal({ open, onClose }) {
+export default function DressStandardsModal({
+  open,
+  onClose,
+}) {
   const dialogRef = useRef(null);
-  const [imageFailed, setImageFailed] = useState(false);
+  const [imageFailed, setImageFailed] =
+    useState(false);
 
-  const posterUrl = '/ltc-dress-standards.png';
+  const posterUrl =
+    `${import.meta.env.BASE_URL}images/ltc-dress-standards.png`;
 
   useEffect(() => {
     const dialog = dialogRef.current;
 
+    if (!dialog) {
+      return undefined;
+    }
+
     if (!open) {
-      if (dialog.open) dialog.close();
+      if (dialog.open) {
+        dialog.close();
+      }
+
       return undefined;
     }
 
     setImageFailed(false);
 
-    const previousFocus = document.activeElement;
-    const previousOverflow = document.body.style.overflow;
+    const previousFocus =
+      document.activeElement;
 
-    document.body.style.overflow = 'hidden';
+    const previousOverflow =
+      document.body.style.overflow;
 
-    if (!dialog.open) dialog.showModal();
+    document.body.style.overflow =
+      "hidden";
+
+    if (!dialog.open) {
+      dialog.showModal();
+    }
 
     return () => {
-      if (dialog.open) dialog.close();
+      if (dialog.open) {
+        dialog.close();
+      }
 
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow =
+        previousOverflow;
 
-      if (previousFocus instanceof HTMLElement) {
+      if (
+        previousFocus instanceof HTMLElement
+      ) {
         previousFocus.focus();
       }
     };
@@ -71,7 +94,8 @@ export default function DressStandardsModal({ open, onClose }) {
 
         <div className="overflow-y-auto p-5 md:p-7">
           <p>
-            All clothing should be modest, neat, clean, and appropriate for a
+            All clothing should be modest,
+            neat, clean, and appropriate for a
             learning and spiritual environment.
           </p>
 
@@ -81,17 +105,24 @@ export default function DressStandardsModal({ open, onClose }) {
                 src={posterUrl}
                 alt="LTC student dress standards poster showing examples of Church, classroom, sports, cultural, casual campus and construction attire."
                 className="h-auto w-full"
-                onError={() => setImageFailed(true)}
+                onError={() =>
+                  setImageFailed(true)
+                }
               />
             ) : (
-              <p role="status" className="p-5">
-                The illustrated guide could not load. Please close this window
+              <p
+                role="status"
+                className="p-5"
+              >
+                The illustrated guide could not
+                load. Please close this window
                 and try again.
               </p>
             )}
 
             <figcaption className="border-t border-slate-200 p-3 text-sm text-slate-600">
-              Illustrated LTC student dress standards.{' '}
+              Illustrated LTC student dress
+              standards.{" "}
               <a
                 href={posterUrl}
                 target="_blank"
@@ -110,23 +141,30 @@ export default function DressStandardsModal({ open, onClose }) {
 
             <ul className="mt-2 list-disc space-y-2 pl-6">
               <li>
-                Dress standards reflect the values of the Light Training
+                Dress standards reflect the
+                values of the Light Training
                 Center (LTC).
               </li>
 
               <li>
-                We are here to learn, serve and prepare the next generation for
+                We are here to learn, serve and
+                prepare the next generation for
                 future missionaries.
               </li>
 
-              <li>When in doubt, choose what is modest and respectful.</li>
-
               <li>
-                Cleanliness reflects your respect for yourself and others.
+                When in doubt, choose what is
+                modest and respectful.
               </li>
 
               <li>
-                The LTC community is a place of growth, learning, and mutual
+                Cleanliness reflects your
+                respect for yourself and others.
+              </li>
+
+              <li>
+                The LTC community is a place of
+                growth, learning, and mutual
                 respect.
               </li>
             </ul>

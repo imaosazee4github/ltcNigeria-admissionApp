@@ -78,14 +78,7 @@ export default function EducationProgrammeStep({
               training.
             </p>
 
-            {/* <h1 className="mt-2 text-3xl font-bold text-blue-900">
-              Prior Vocational Training or Skills
-            </h1>
-
-            <p className="mt-2 text-slate-600">
-              Mention any vocational programme you have attended or practical
-              skills you have acquired. This section is optional.
-            </p> */}
+            
           </header>
 
           {errorMessage && (
