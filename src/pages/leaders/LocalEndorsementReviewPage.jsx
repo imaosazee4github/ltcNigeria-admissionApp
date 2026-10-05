@@ -886,12 +886,12 @@ function CandidateSummary({
           }
         />
 
-        <SummaryValue
+        {/* <SummaryValue
           label="Membership number"
           value={
             application.membership_record_number
           }
-        />
+        /> */}
       </div>
     </section>
   );

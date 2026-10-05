@@ -166,6 +166,9 @@ export async function uploadApplicationDocument({
     file_size: file.size,
     mime_type: file.type,
 
+    // verification_status: 'pending',
+    // rejection_reason: null,
+
     document_subtype:
       documentType.code === 'identity_document'
         ? documentSubtype

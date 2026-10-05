@@ -290,13 +290,13 @@ export default function ReviewSubmissionStep({
               )}
             />
 
-            <ReviewItem
+            {/* <ReviewItem
               label="Membership Record Number"
               value={
                 candidateProfile
                   .membership_record_number
               }
-            />
+            /> */}
 
             <ReviewItem
               label="Bishop or Branch President"

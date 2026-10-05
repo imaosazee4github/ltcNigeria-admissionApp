@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { useQueryClient } from "@tanstack/react-query";
+
 import { useAdminApplication } from "../../hooks/useAdminApplications";
-import { createDocumentSignedUrl } from "../../services/adminApplicationService";
+import {
+  createDocumentSignedUrl,
+  verifyApplicationDocument,
+} from "../../services/adminApplicationService";
 
 export default function ApplicationReviewPage() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const {
     data: application,
@@ -20,6 +26,8 @@ export default function ApplicationReviewPage() {
   const [openingDocumentId, setOpeningDocumentId] = useState(null);
   const [comments, setComments] = useState("");
   const [localReviewError, setLocalReviewError] = useState("");
+  const [savingDocumentId, setSavingDocumentId] = useState(null);
+  const [documentSuccess, setDocumentSuccess] = useState("");
 
   const [documentError, setDocumentError] = useState("");
 
@@ -52,6 +60,32 @@ export default function ApplicationReviewPage() {
       setDocumentError(openError.message);
     } finally {
       setOpeningDocumentId(null);
+    }
+  }
+
+  async function handleVerifyDocument(document) {
+    setDocumentError("");
+    setDocumentSuccess("");
+    setSavingDocumentId(document.id);
+
+    try {
+      await verifyApplicationDocument({
+        documentId: document.id,
+        status: "verified",
+        storagePath: document.storage_path,
+      });
+
+      // Refresh active queries and mark cached data for refetch.
+      await queryClient.invalidateQueries();
+
+      setDocumentSuccess("Document marked as verified.");
+
+      return true;
+    } catch (verificationError) {
+      setDocumentError(verificationError.message);
+      return false;
+    } finally {
+      setSavingDocumentId(null);
     }
   }
 
@@ -197,10 +231,10 @@ export default function ApplicationReviewPage() {
                   value={formatValue(candidate?.local_unit_type)}
                 />
 
-                <InformationItem
+                {/* <InformationItem
                   label="Membership record number"
                   value={candidate?.membership_record_number}
-                />
+                /> */}
 
                 <InformationItem
                   label="Bishop or Branch President"
@@ -217,35 +251,6 @@ export default function ApplicationReviewPage() {
                   value={formatValue(
                     candidate?.church_unit_verification_status,
                   )}
-                />
-              </InformationGrid>
-            </InformationSection>
-
-            <InformationSection title="Mission Information">
-              <InformationGrid>
-                <InformationItem
-                  label="Missionary status"
-                  value={formatValue(candidate?.missionary_status)}
-                />
-
-                <InformationItem
-                  label="Mission name"
-                  value={candidate?.mission_name}
-                />
-
-                <InformationItem
-                  label="Mission country"
-                  value={candidate?.mission_country}
-                />
-
-                <InformationItem
-                  label="Mission start date"
-                  value={formatDate(candidate?.mission_start_date)}
-                />
-
-                <InformationItem
-                  label="Mission end date"
-                  value={formatDate(candidate?.mission_end_date)}
                 />
               </InformationGrid>
             </InformationSection>
@@ -317,6 +322,11 @@ export default function ApplicationReviewPage() {
                 </div>
               )}
 
+              {documentSuccess && (
+                <p role="status" className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+                  {documentSuccess}
+                </p>
+              )}
               {documents.length === 0 ? (
                 <p className="text-slate-600">
                   No documents have been uploaded.
@@ -329,6 +339,9 @@ export default function ApplicationReviewPage() {
                       document={document}
                       opening={openingDocumentId === document.id}
                       onOpen={() => handleOpenDocument(document)}
+                      onVerify={() => handleVerifyDocument(document)}
+                      saving={savingDocumentId === document.id}
+                      busy={savingDocumentId !== null}
                     />
                   ))}
                 </div>
@@ -456,7 +469,6 @@ export default function ApplicationReviewPage() {
                 </p>
               )}
             </section>
-
           </aside>
         </div>
       </div>
@@ -504,50 +516,84 @@ function SummaryItem({ label, value }) {
   );
 }
 
-function DocumentRow({ document, opening, onOpen }) {
-  const type = document.document_types;
-
+function DocumentRow({
+  document,
+  opening,
+  saving,
+  busy,
+  onOpen,
+  onVerify,
+}) {
   return (
-    <div className="flex flex-col justify-between gap-4 rounded-lg border border-slate-200 p-4 sm:flex-row sm:items-center">
-      <div>
-        <p className="font-semibold text-slate-900">
-          {type?.name || formatValue(type?.code) || "Document"}
-        </p>
+    <article className="rounded-xl border border-slate-200 bg-white p-5">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row">
+        <div className="min-w-0">
+          <h3 className="font-semibold text-slate-900">
+            {document.document_types?.name ||
+              formatValue(document.document_types?.code) ||
+              'Document'}
+          </h3>
 
-        <p className="mt-1 text-sm text-slate-600">
-          {document.original_filename}
-        </p>
-
-        {document.document_subtype && (
-          <p className="mt-1 text-xs text-slate-500">
-            Type: {formatValue(document.document_subtype)}
+          <p className="mt-1 break-words text-sm text-slate-500">
+            {document.original_filename}
           </p>
-        )}
+
+          {document.document_subtype && (
+            <p className="mt-1 text-xs text-slate-500">
+              Type: {formatValue(document.document_subtype)}
+            </p>
+          )}
+        </div>
+
+        <div className="shrink-0">
+          <DocumentStatus status={document.verification_status} />
+        </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <DocumentStatus status={document.verification_status} />
-
+      <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
         <button
           type="button"
           onClick={onOpen}
-          disabled={opening}
-          className="rounded-md border border-blue-800 px-4 py-2 text-sm font-semibold text-blue-800 disabled:opacity-60"
+          disabled={opening || busy}
+          className="rounded-lg border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-800 hover:bg-blue-50 disabled:opacity-50"
         >
-          {opening ? "Opening..." : "View"}
+          {opening ? 'Opening...' : 'View document'}
         </button>
+
+        <button
+          type="button"
+          disabled={busy || document.verification_status === 'verified'}
+          onClick={onVerify}
+          className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-50"
+        >
+          {saving ? 'Saving...' : 'Verify'}
+        </button>
+
       </div>
-    </div>
+
+    </article>
   );
 }
 
 function DocumentStatus({ status }) {
+  const colors = {
+    pending: 'bg-amber-100 text-amber-800',
+    verified: 'bg-emerald-100 text-emerald-800',
+    rejected: 'bg-red-100 text-red-700',
+  };
+
   return (
-    <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
-      {formatValue(status || "pending")}
+    <span
+      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+        colors[status || 'pending'] || 'bg-slate-100 text-slate-700'
+      }`}
+    >
+      {formatValue(status || 'pending')}
     </span>
   );
 }
+
+
 
 function StatusBadge({ status }) {
   const labels = {
