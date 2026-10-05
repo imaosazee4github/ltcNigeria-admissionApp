@@ -9,11 +9,10 @@ import {
 import HonorCodeModal from '../../components/common/HonorCodeModal';
 
 const requiredDocuments = [
-  'Passport photograph',
-  'NIN document or international passport',
-  'Mission certificate',
-  'Educational certificate',
-  'Any additional document requested by LTC Admissions',
+  'Medical Fitness Certificate',
+  'NIN or International Passport',
+  'Participant Commitment and Program Expectations',
+  'Passport Photographs',
 ];
 
 const coreValues = [
@@ -50,7 +49,7 @@ const coreValues = [
 ];
 
 const accommodationRules = [
-  'Male and female students are assigned to separate dormitories.',
+  'Male and female students are assigned to separate dormitories. Students must not enter dormitories designated for the opposite gender, except for duties specifically authorized and supervised by LTC administration.',
   'Students must use only their assigned room and bed space.',
   'Room changes require approval from an authorized LTC administrator.',
   'Students are responsible for maintaining cleanliness and order.',
