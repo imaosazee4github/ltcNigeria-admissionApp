@@ -1,52 +1,46 @@
-import { useEffect, useRef, useState } from 'react'
-import dressStandardsImage from '../../assets/ltc-dress-standards.png'
+import { useEffect, useRef, useState } from 'react';
 
 export default function DressStandardsModal({ open, onClose }) {
-  const dialogRef = useRef(null)
-  const [imageFailed, setImageFailed] = useState(false)
+  const dialogRef = useRef(null);
+  const [imageFailed, setImageFailed] = useState(false);
+
+  const posterUrl = '/ltc-dress-standards.png';
 
   useEffect(() => {
-    const dialog = dialogRef.current
+    const dialog = dialogRef.current;
 
     if (!open) {
-      if (dialog.open) {
-        dialog.close()
-      }
-
-      return undefined
+      if (dialog.open) dialog.close();
+      return undefined;
     }
 
-    const previousFocus = document.activeElement
-    const previousOverflow = document.body.style.overflow
+    setImageFailed(false);
 
-    setImageFailed(false)
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
 
-    document.body.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden';
 
-    if (!dialog.open) {
-      dialog.showModal()
-    }
+    if (!dialog.open) dialog.showModal();
 
     return () => {
-      if (dialog.open) {
-        dialog.close()
-      }
+      if (dialog.open) dialog.close();
 
-      document.body.style.overflow = previousOverflow
+      document.body.style.overflow = previousOverflow;
 
       if (previousFocus instanceof HTMLElement) {
-        previousFocus.focus()
+        previousFocus.focus();
       }
-    }
-  }, [open])
+    };
+  }, [open]);
 
   return (
     <dialog
       ref={dialogRef}
       aria-labelledby="dress-standards-title"
       onCancel={(event) => {
-        event.preventDefault()
-        onClose()
+        event.preventDefault();
+        onClose();
       }}
       className="m-auto w-[calc(100%-2rem)] max-w-6xl rounded-xl bg-white p-0 text-slate-700 shadow-2xl backdrop:bg-slate-950/70"
     >
@@ -84,7 +78,7 @@ export default function DressStandardsModal({ open, onClose }) {
           <figure className="mt-5 overflow-hidden rounded-lg border border-slate-200">
             {!imageFailed ? (
               <img
-                src={dressStandardsImage}
+                src={posterUrl}
                 alt="LTC student dress standards poster showing examples of Church, classroom, sports, cultural, casual campus and construction attire."
                 className="h-auto w-full"
                 onError={() => setImageFailed(true)}
@@ -99,7 +93,7 @@ export default function DressStandardsModal({ open, onClose }) {
             <figcaption className="border-t border-slate-200 p-3 text-sm text-slate-600">
               Illustrated LTC student dress standards.{' '}
               <a
-                href={dressStandardsImage}
+                href={posterUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold text-blue-900 underline"
@@ -121,13 +115,11 @@ export default function DressStandardsModal({ open, onClose }) {
               </li>
 
               <li>
-                We are here to learn, serve and prepare the next generation
-                for future missionaries.
+                We are here to learn, serve and prepare the next generation for
+                future missionaries.
               </li>
 
-              <li>
-                When in doubt, choose what is modest and respectful.
-              </li>
+              <li>When in doubt, choose what is modest and respectful.</li>
 
               <li>
                 Cleanliness reflects your respect for yourself and others.
@@ -152,5 +144,5 @@ export default function DressStandardsModal({ open, onClose }) {
         </footer>
       </div>
     </dialog>
-  )
+  );
 }
