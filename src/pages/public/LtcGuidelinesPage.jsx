@@ -253,13 +253,15 @@ export default function LtcGuidelinesPage() {
           </h2>
 
           <p className="mt-3 leading-7 text-red-800">
-            False information, altered
-            documents, misleading
-            ecclesiastical details or serious
-            misconduct may result in
-            application rejection,
-            withdrawal of admission or
-            further administrative review.
+            Providing false information,
+            submitting altered documents,
+            giving misleading ecclesiastical
+            details or engaging in serious
+            misconduct may result in rejection
+            of your application, withdrawal of
+            admission, further administrative
+            review or expulsion from campus
+            after you have begun the programme.
           </p>
         </div>
       </div>
@@ -382,6 +384,13 @@ function PublicHeader() {
           </Link>
 
           <Link
+            to="/about-ltc"
+            className="text-slate-700 hover:text-blue-900"
+          >
+            About LTC
+          </Link>
+
+          <Link
             to="/ltc-guidelines"
             className="font-semibold text-blue-900"
           >
@@ -417,6 +426,13 @@ function PublicFooter() {
         </p>
 
         <div className="flex gap-5">
+          <Link
+            to="/about-ltc"
+            className="hover:text-blue-900"
+          >
+            About LTC
+          </Link>
+
           <Link
             to="/admission-process"
             className="hover:text-blue-900"
