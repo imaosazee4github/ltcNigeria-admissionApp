@@ -297,7 +297,18 @@ export default function AboutLtcPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl bg-slate-100 p-8 text-center">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+              <iframe
+                title="LTC Nigeria campus location on Google Maps"
+                src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d267.98081983872424!2d3.2889651944188656!3d7.012066332283831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sng!4v1791198052272!5m2!1sen!2sng"
+                className="block h-[320px] w-full border-0 sm:h-[400px]"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            </div>
+
+            {/* <div className="rounded-2xl bg-slate-100 p-8 text-center">
               <MapPin className="mx-auto h-8 w-8 text-blue-900" />
 
               <p className="mt-4 font-semibold text-blue-950">
@@ -308,7 +319,7 @@ export default function AboutLtcPage() {
                 Additional campus directions and official location resources
                 can be added here as they become available.
               </p>
-            </div>
+            </div> */}
           </div>
         </section>
 
