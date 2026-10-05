@@ -268,10 +268,6 @@ export default function ContactEmergencyStep({
                       Select relationship
                     </option>
 
-                    <option value="spouse">
-                      Spouse
-                    </option>
-
                     <option value="parent">
                       Parent
                     </option>

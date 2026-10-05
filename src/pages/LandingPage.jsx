@@ -117,6 +117,7 @@ export default function LandingPage() {
           </Link>
 
           <nav className="hidden items-center gap-8 text-sm md:flex">
+            
             <Link
               to="/admission-process"
               className="text-slate-700 transition hover:text-blue-900"
