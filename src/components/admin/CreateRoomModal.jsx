@@ -1,106 +1,63 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import {
-  useCreateHostelRoom,
-} from '../../hooks/useAdminRooms';
+import { useCreateHostelRoom } from "../../hooks/useAdminRooms";
 
 const initialForm = {
-  dormitoryId: '',
-  roomName: '',
-  bunkBedCount: '',
-  description: '',
+  dormitoryId: "",
+  roomName: "",
+  bunkBedCount: "",
+  description: "",
 };
 
-export default function CreateRoomModal({
-  open,
-  onClose,
-  dormitories = [],
-}) {
-  const [formData, setFormData] =
-    useState(initialForm);
+export default function CreateRoomModal({ open, onClose, dormitories = [] }) {
+  const [formData, setFormData] = useState(initialForm);
 
-  const [message, setMessage] =
-    useState('');
+  const [message, setMessage] = useState("");
 
-  const {
-    createRoom,
-    creating,
-    creationError,
-    resetCreation,
-  } = useCreateHostelRoom();
+  const { createRoom, creating, creationError, resetCreation } =
+    useCreateHostelRoom();
 
-  const selectedDormitory =
-    useMemo(
-      () =>
-        dormitories.find(
-          (dormitory) =>
-            dormitory.id ===
-            formData.dormitoryId
-        ) || null,
-      [
-        dormitories,
-        formData.dormitoryId,
-      ]
-    );
-
-  const maximumBunkBeds =
-    selectedDormitory?.gender === 'male'
-      ? 12
-      : 10;
-
-  const currentRoomCount =
-    selectedDormitory?.total_rooms || 0;
-
-  const remainingRooms = Math.max(
-    0,
-    4 - currentRoomCount
+  const selectedDormitory = useMemo(
+    () =>
+      dormitories.find((dormitory) => dormitory.id === formData.dormitoryId) ||
+      null,
+    [dormitories, formData.dormitoryId],
   );
 
-  const calculatedCapacity =
-    Number(formData.bunkBedCount || 0) * 2;
+  const maximumBunkBeds = selectedDormitory?.gender === "male" ? 12 : 10;
+
+  const currentRoomCount = selectedDormitory?.total_rooms || 0;
+
+  const remainingRooms = Math.max(0, 4 - currentRoomCount);
+
+  const calculatedCapacity = Number(formData.bunkBedCount || 0) * 2;
 
   useEffect(() => {
     if (!open) return undefined;
 
     function handleKeyDown(event) {
-      if (
-        event.key === 'Escape' &&
-        !creating
-      ) {
+      if (event.key === "Escape" && !creating) {
         onClose();
       }
     }
 
-    const previousOverflow =
-      document.body.style.overflow;
+    const previousOverflow = document.body.style.overflow;
 
-    document.body.style.overflow =
-      'hidden';
+    document.body.style.overflow = "hidden";
 
-    window.addEventListener(
-      'keydown',
-      handleKeyDown
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
+      document.body.style.overflow = previousOverflow;
 
-      window.removeEventListener(
-        'keydown',
-        handleKeyDown
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [open, onClose, creating]);
 
   useEffect(() => {
     if (open) {
       setFormData(initialForm);
-      setMessage('');
+      setMessage("");
       resetCreation();
     }
   }, [open, resetCreation]);
@@ -108,12 +65,9 @@ export default function CreateRoomModal({
   if (!open) return null;
 
   function handleChange(event) {
-    const {
-      name,
-      value,
-    } = event.target;
+    const { name, value } = event.target;
 
-    setMessage('');
+    setMessage("");
 
     setFormData((current) => ({
       ...current,
@@ -122,63 +76,52 @@ export default function CreateRoomModal({
   }
 
   function handleDormitoryChange(event) {
-    setMessage('');
+    setMessage("");
 
     setFormData((current) => ({
       ...current,
       dormitoryId: event.target.value,
-      bunkBedCount: '',
+      bunkBedCount: "",
     }));
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setMessage('');
+    setMessage("");
 
     if (!selectedDormitory) {
-      setMessage(
-        'Select a dormitory.'
-      );
+      setMessage("Select a dormitory.");
 
       return;
     }
 
     if (currentRoomCount >= 4) {
-      setMessage(
-        `${selectedDormitory.house_name} already has four rooms.`
-      );
+      setMessage(`${selectedDormitory.house_name} already has four rooms.`);
 
       return;
     }
 
-    const bunkBedCount =
-      Number(formData.bunkBedCount);
+    const bunkBedCount = Number(formData.bunkBedCount);
 
     if (
       !Number.isInteger(bunkBedCount) ||
       bunkBedCount < 1 ||
-      bunkBedCount >
-        maximumBunkBeds
+      bunkBedCount > maximumBunkBeds
     ) {
-      setMessage(
-        `Enter between 1 and ${maximumBunkBeds} double bunk beds.`
-      );
+      setMessage(`Enter between 1 and ${maximumBunkBeds} double bunk beds.`);
 
       return;
     }
 
     try {
       await createRoom({
-        dormitoryId:
-          formData.dormitoryId,
+        dormitoryId: formData.dormitoryId,
 
-        roomName:
-          formData.roomName,
+        roomName: formData.roomName,
 
         bunkBedCount,
 
-        description:
-          formData.description,
+        description: formData.description,
       });
 
       onClose();
@@ -192,11 +135,7 @@ export default function CreateRoomModal({
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
       role="presentation"
       onMouseDown={(event) => {
-        if (
-          event.target ===
-            event.currentTarget &&
-          !creating
-        ) {
+        if (event.target === event.currentTarget && !creating) {
           onClose();
         }
       }}
@@ -205,9 +144,9 @@ export default function CreateRoomModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-room-title"
-        className="w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="flex max-h-[calc(100dvh-2rem)] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
       >
-        <header className="flex items-start justify-between gap-4 border-b border-slate-200 p-6">
+        <header className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 p-6">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-amber-600">
               Accommodation
@@ -221,8 +160,7 @@ export default function CreateRoomModal({
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Add a room and generate its
-              bed spaces automatically.
+              Add a room and generate its bed spaces automatically.
             </p>
           </div>
 
@@ -236,10 +174,9 @@ export default function CreateRoomModal({
             ×
           </button>
         </header>
-
         <form
           onSubmit={handleSubmit}
-          className="space-y-5 p-6"
+          className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain p-6"
         >
           <div>
             <label
@@ -252,41 +189,24 @@ export default function CreateRoomModal({
             <select
               id="dormitoryId"
               name="dormitoryId"
-              value={
-                formData.dormitoryId
-              }
-              onChange={
-                handleDormitoryChange
-              }
+              value={formData.dormitoryId}
+              onChange={handleDormitoryChange}
               required
               className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-100"
             >
-              <option value="">
-                Select a dormitory
-              </option>
+              <option value="">Select a dormitory</option>
 
-              {dormitories.map(
-                (dormitory) => (
-                  <option
-                    key={dormitory.id}
-                    value={dormitory.id}
-                    disabled={
-                      dormitory.status !==
-                        'active' ||
-                      dormitory.total_rooms >=
-                        4
-                    }
-                  >
-                    {
-                      dormitory.house_name
-                    }{' '}
-                    —{' '}
-                    {
-                      dormitory.hostel_label
-                    }
-                  </option>
-                )
-              )}
+              {dormitories.map((dormitory) => (
+                <option
+                  key={dormitory.id}
+                  value={dormitory.id}
+                  disabled={
+                    dormitory.status !== "active" || dormitory.total_rooms >= 4
+                  }
+                >
+                  {dormitory.house_name} — {dormitory.hostel_label}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -294,23 +214,12 @@ export default function CreateRoomModal({
             <div className="grid gap-3 rounded-xl bg-blue-50 p-4 sm:grid-cols-3">
               <Information
                 label="Gender"
-                value={
-                  selectedDormitory.gender ===
-                  'male'
-                    ? 'Male'
-                    : 'Female'
-                }
+                value={selectedDormitory.gender === "male" ? "Male" : "Female"}
               />
 
-              <Information
-                label="Rooms"
-                value={`${currentRoomCount}/4`}
-              />
+              <Information label="Rooms" value={`${currentRoomCount}/4`} />
 
-              <Information
-                label="Rooms Remaining"
-                value={remainingRooms}
-              />
+              <Information label="Rooms Remaining" value={remainingRooms} />
             </div>
           )}
 
@@ -349,15 +258,13 @@ export default function CreateRoomModal({
               type="number"
               min="1"
               max={maximumBunkBeds}
-              value={
-                formData.bunkBedCount
-              }
+              value={formData.bunkBedCount}
               onChange={handleChange}
               disabled={!selectedDormitory}
               placeholder={
                 selectedDormitory
                   ? `Maximum ${maximumBunkBeds}`
-                  : 'Select a dormitory first'
+                  : "Select a dormitory first"
               }
               required
               className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100"
@@ -366,7 +273,7 @@ export default function CreateRoomModal({
             <p className="mt-2 text-xs text-slate-500">
               {selectedDormitory
                 ? `${selectedDormitory.house_name} allows a maximum of ${maximumBunkBeds} double bunk beds per room.`
-                : 'Male rooms allow 12 bunk beds. Female rooms allow 10.'}
+                : "Male rooms allow 12 bunk beds. Female rooms allow 10."}
             </p>
           </div>
 
@@ -399,23 +306,19 @@ export default function CreateRoomModal({
               id="description"
               name="description"
               rows="3"
-              value={
-                formData.description
-              }
+              value={formData.description}
               onChange={handleChange}
               placeholder="Additional information about this room"
               className="mt-2 w-full resize-none rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
-          {(message ||
-            creationError) && (
+          {(message || creationError) && (
             <div
               role="alert"
               className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
             >
-              {message ||
-                creationError?.message}
+              {message || creationError?.message}
             </div>
           )}
 
@@ -431,16 +334,10 @@ export default function CreateRoomModal({
 
             <button
               type="submit"
-              disabled={
-                creating ||
-                !selectedDormitory ||
-                currentRoomCount >= 4
-              }
+              disabled={creating || !selectedDormitory || currentRoomCount >= 4}
               className="rounded-lg bg-blue-900 px-5 py-3 font-semibold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {creating
-                ? 'Creating Room...'
-                : 'Create Room'}
+              {creating ? "Creating Room..." : "Create Room"}
             </button>
           </footer>
         </form>
@@ -449,19 +346,12 @@ export default function CreateRoomModal({
   );
 }
 
-function Information({
-  label,
-  value,
-}) {
+function Information({ label, value }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase text-slate-500">
-        {label}
-      </p>
+      <p className="text-xs font-semibold uppercase text-slate-500">{label}</p>
 
-      <p className="mt-1 font-bold text-blue-900">
-        {value}
-      </p>
+      <p className="mt-1 font-bold text-blue-900">{value}</p>
     </div>
   );
 }
