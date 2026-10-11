@@ -22,6 +22,16 @@ export default function DocumentUploadStep({
     deleting,
   } = useDocuments(application.id);
 
+// const [message, setMessage] = useState("");
+// const [messageType, setMessageType] = useState("");
+
+const canEditDocuments = [
+  "draft",
+  "correction_required",
+].includes(application.status);
+
+const documentActionsDisabled = !canEditDocuments || uploading || deleting;
+
   const fileInputRefs = useRef({});
 
   const [identityType, setIdentityType] = useState("nin");
@@ -32,6 +42,9 @@ export default function DocumentUploadStep({
 
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+
+  // const [message, setMessage] = useState("");
+  // const [messageType, setMessageType] = useState("");
 
   function getUploadedDocument(documentTypeId) {
     return documents.find((document) => {
@@ -83,13 +96,21 @@ export default function DocumentUploadStep({
     await handleUpload(documentType, file);
   }
 
-  function openFilePicker(documentTypeId) {
-    if (uploading || deleting || application.status !== "draft") {
-      return;
-    }
+  // function openFilePicker(documentTypeId) {
+  //   if (uploading || deleting || application.status !== "draft") {
+  //     return;
+  //   }
 
-    fileInputRefs.current[documentTypeId]?.click();
+  //   fileInputRefs.current[documentTypeId]?.click();
+  // }
+
+  function openFilePicker(documentTypeId) {
+  if (documentActionsDisabled) {
+    return;
   }
+
+  fileInputRefs.current[documentTypeId]?.click();
+}
 
   async function handleDelete(document) {
     const confirmed = window.confirm(`Delete ${document.original_filename}?`);
@@ -282,11 +303,12 @@ export default function DocumentUploadStep({
                       )
                     }
                     className="sr-only"
-                    disabled={
-                      isUploadingThis ||
-                      deleting ||
-                      application.status !== "draft"
-                    }
+                    disabled={documentActionsDisabled}
+                    // disabled={
+                    //   isUploadingThis ||
+                    //   deleting ||
+                    //   application.status !== "draft"
+                    // }
                   />
 
                   {uploaded ? (
@@ -294,11 +316,12 @@ export default function DocumentUploadStep({
                       <button
                         type="button"
                         onClick={() => openFilePicker(documentType.id)}
-                        disabled={
-                          isUploadingThis ||
-                          deleting ||
-                          application.status !== "draft"
-                        }
+                        // disabled={
+                        //   isUploadingThis ||
+                        //   deleting ||
+                        //   application.status !== "draft"
+                        // }
+                        disabled={documentActionsDisabled}
                         aria-label={`Change ${documentType.name}`}
                         className="group flex w-full items-center gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 pr-14 text-left transition hover:border-blue-300 hover:bg-blue-50/50 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                       >
@@ -338,11 +361,12 @@ export default function DocumentUploadStep({
                             current === documentType.id ? "" : documentType.id,
                           )
                         }
-                        disabled={
-                          isUploadingThis ||
-                          deleting ||
-                          application.status !== "draft"
-                        }
+                        // disabled={
+                        //   isUploadingThis ||
+                        //   deleting ||
+                        //   application.status !== "draft"
+                        // }
+                        disabled={documentActionsDisabled}
                         className="absolute right-3 top-3 rounded-md px-3 py-2 text-xl font-bold leading-none text-slate-500 hover:bg-white hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-700 disabled:opacity-50"
                       >
                         ⋮
@@ -353,7 +377,8 @@ export default function DocumentUploadStep({
                           <button
                             type="button"
                             onClick={() => handleDelete(uploaded)}
-                            disabled={deleting}
+                            // disabled={deleting}
+                            disabled={documentActionsDisabled}
                             className="w-full rounded-md px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
                           >
                             {deleting ? "Deleting..." : "Delete document"}
@@ -371,11 +396,12 @@ export default function DocumentUploadStep({
                     <button
                       type="button"
                       onClick={() => openFilePicker(documentType.id)}
-                      disabled={
-                        isUploadingThis ||
-                        deleting ||
-                        application.status !== "draft"
-                      }
+                      // disabled={
+                      //   isUploadingThis ||
+                      //   deleting ||
+                      //   application.status !== "draft"
+                      // }
+                      disabled={documentActionsDisabled}
                       className="mt-5 flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 px-5 py-8 text-center transition hover:border-blue-400 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <span className="text-sm font-semibold text-blue-900">
