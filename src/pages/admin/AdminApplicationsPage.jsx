@@ -76,6 +76,7 @@ export default function AdminApplicationsPage() {
         profile?.full_name,
         profile?.email,
         application.application_number,
+        application.admission_number,
         candidate?.local_unit_name,
         candidate?.ecclesiastical_area_name,
         application.admission_intakes?.name,
@@ -228,10 +229,6 @@ function ApplicationRow({ application, selected, onSelect }) {
             {profile?.full_name || "Unknown candidate"}
           </p>
 
-          <p className="mt-1 text-sm text-slate-500">
-            {application.application_number || "Application number pending"}
-          </p>
-
           <p className="mt-1 text-sm font-semibold text-blue-900">
             Admission number:{" "}
             {application.admission_number || "Not yet assigned"}
@@ -282,8 +279,8 @@ function ApplicationSummaryPanel({ application }) {
         {profile?.full_name || "Unknown candidate"}
       </h2>
 
-      <p className="mt-1 text-sm text-slate-500">
-        {application.application_number || "Number pending"}
+      <p className="mt-1 text-sm font-semibold text-blue-900">
+        Admission number: {application.admission_number || "Not yet assigned"}
       </p>
 
       <div className="mt-5 space-y-4">

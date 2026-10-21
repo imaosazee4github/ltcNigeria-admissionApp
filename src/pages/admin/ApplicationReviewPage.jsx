@@ -154,11 +154,9 @@ export default function ApplicationReviewPage() {
               {profile?.full_name || "Candidate Application"}
             </h1>
 
-            <p className="mt-2 text-slate-600">
-              Application number:{" "}
-              <span className="font-semibold">
-                {application.application_number || "Not assigned"}
-              </span>
+            <p className="mt-2 text-sm font-semibold text-blue-900">
+              Admission number:{" "}
+              {application.admission_number || "Not yet assigned"}
             </p>
           </div>
 
@@ -323,7 +321,10 @@ export default function ApplicationReviewPage() {
               )}
 
               {documentSuccess && (
-                <p role="status" className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+                <p
+                  role="status"
+                  className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-emerald-800"
+                >
                   {documentSuccess}
                 </p>
               )}
@@ -516,14 +517,7 @@ function SummaryItem({ label, value }) {
   );
 }
 
-function DocumentRow({
-  document,
-  opening,
-  saving,
-  busy,
-  onOpen,
-  onVerify,
-}) {
+function DocumentRow({ document, opening, saving, busy, onOpen, onVerify }) {
   return (
     <article className="rounded-xl border border-slate-200 bg-white p-5">
       <div className="flex flex-col justify-between gap-4 sm:flex-row">
@@ -531,7 +525,7 @@ function DocumentRow({
           <h3 className="font-semibold text-slate-900">
             {document.document_types?.name ||
               formatValue(document.document_types?.code) ||
-              'Document'}
+              "Document"}
           </h3>
 
           <p className="mt-1 break-words text-sm text-slate-500">
@@ -557,43 +551,39 @@ function DocumentRow({
           disabled={opening || busy}
           className="rounded-lg border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-800 hover:bg-blue-50 disabled:opacity-50"
         >
-          {opening ? 'Opening...' : 'View document'}
+          {opening ? "Opening..." : "View document"}
         </button>
 
         <button
           type="button"
-          disabled={busy || document.verification_status === 'verified'}
+          disabled={busy || document.verification_status === "verified"}
           onClick={onVerify}
           className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-50"
         >
-          {saving ? 'Saving...' : 'Verify'}
+          {saving ? "Saving..." : "Verify"}
         </button>
-
       </div>
-
     </article>
   );
 }
 
 function DocumentStatus({ status }) {
   const colors = {
-    pending: 'bg-amber-100 text-amber-800',
-    verified: 'bg-emerald-100 text-emerald-800',
-    rejected: 'bg-red-100 text-red-700',
+    pending: "bg-amber-100 text-amber-800",
+    verified: "bg-emerald-100 text-emerald-800",
+    rejected: "bg-red-100 text-red-700",
   };
 
   return (
     <span
       className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-        colors[status || 'pending'] || 'bg-slate-100 text-slate-700'
+        colors[status || "pending"] || "bg-slate-100 text-slate-700"
       }`}
     >
-      {formatValue(status || 'pending')}
+      {formatValue(status || "pending")}
     </span>
   );
 }
-
-
 
 function StatusBadge({ status }) {
   const labels = {

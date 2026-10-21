@@ -95,8 +95,6 @@ export async function getAdminApplicationQueue() {
       application_number,
       admission_number,
       admission_serial,
-      admission_number,
-      admission_serial,
       status,
       completion_percentage,
       current_step,
