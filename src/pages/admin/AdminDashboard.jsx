@@ -280,17 +280,10 @@ function RecentApplications({ applications }) {
                     {profile?.full_name || "Unknown candidate"}
                   </p>
 
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    Application number:{" "}
-                    {application.application_number || "Pending"}
+                  <p className="mt-1 text-sm font-semibold text-blue-900">
+                    Admission number:{" "}
+                    {application.admission_number || "Not yet assigned"}
                   </p>
-
-                  {application.admission_number && (
-                    <p className="mt-1 text-sm font-semibold text-blue-900">
-                      Admission number: {application.admission_number}
-                    </p>
-                  )}
 
                   <p className="mt-1 text-xs text-slate-400">
                     {application.admission_intakes?.name || "Current intake"}

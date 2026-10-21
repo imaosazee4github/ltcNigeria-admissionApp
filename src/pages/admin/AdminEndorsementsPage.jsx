@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import AdminLayout from "../../layouts/AdminLayout";
@@ -74,9 +68,7 @@ export default function AdminEndorsementsPage() {
   }, [applications, search, statusFilter, warningFilter]);
 
   const hasFilters =
-    Boolean(search.trim()) ||
-    statusFilter !== "all" ||
-    warningFilter !== "all";
+    Boolean(search.trim()) || statusFilter !== "all" || warningFilter !== "all";
 
   function clearFilters() {
     setSearch("");
@@ -89,7 +81,7 @@ export default function AdminEndorsementsPage() {
 
     setSelectedComments({
       candidateName: application.candidate_name || "Unknown candidate",
-      applicationNumber: application.application_number || "Number pending",
+      admissionNumber: application.admission_number || "Not yet assigned",
       stage: isLocal
         ? "Bishop / Branch President"
         : "Stake / District President",
@@ -365,14 +357,10 @@ function CandidateDetails({ application }) {
       <p className="text-sm font-semibold leading-6 text-slate-900">
         {application.candidate_name || "Unknown candidate"}
       </p>
-      <p className="mt-1 break-words font-mono text-xs text-slate-500">
-        {application.application_number || "Number pending"}
+
+      <p className="mt-1 text-sm font-semibold text-blue-900">
+        Admission number: {application.admission_number || "Not yet assigned"}
       </p>
-      {application.admission_number && (
-        <p className="mt-2 text-xs font-semibold text-blue-800">
-          Admission: {application.admission_number}
-        </p>
-      )}
       <p className="mt-2 text-xs leading-5 text-slate-400">
         {application.intake_name || "Current intake"}
       </p>
@@ -407,8 +395,7 @@ function LeaderDecision({ application, stage, onViewComments }) {
   const comments = isLocal
     ? application.local_endorsement_comments
     : application.final_endorsement_comments;
-  const hasComments =
-    typeof comments === "string" && Boolean(comments.trim());
+  const hasComments = typeof comments === "string" && Boolean(comments.trim());
 
   return (
     <div className="space-y-2">
@@ -417,14 +404,10 @@ function LeaderDecision({ application, stage, onViewComments }) {
       <div>
         <p className="text-xs font-medium leading-5 text-slate-700">
           {leaderName ||
-            (isLocal
-              ? "No active local leader"
-              : "No active area president")}
+            (isLocal ? "No active local leader" : "No active area president")}
         </p>
         {date && (
-          <p className="mt-0.5 text-xs text-slate-400">
-            {formatDate(date)}
-          </p>
+          <p className="mt-0.5 text-xs text-slate-400">{formatDate(date)}</p>
         )}
       </div>
 
@@ -441,9 +424,7 @@ function LeaderDecision({ application, stage, onViewComments }) {
           View comments
         </button>
       ) : decision ? (
-        <p className="text-xs italic text-slate-400">
-          No comments recorded
-        </p>
+        <p className="text-xs italic text-slate-400">No comments recorded</p>
       ) : null}
     </div>
   );
@@ -476,9 +457,7 @@ function CommentsModal({ details, onClose }) {
   }, [details]);
 
   const comments =
-    typeof details?.comments === "string"
-      ? details.comments.trim()
-      : "";
+    typeof details?.comments === "string" ? details.comments.trim() : "";
 
   return (
     <dialog
@@ -494,15 +473,10 @@ function CommentsModal({ details, onClose }) {
       <div className="flex max-h-[90vh] flex-col">
         <header className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 sm:px-8">
           <div>
-            <h2
-              id={titleId}
-              className="text-xl font-bold text-slate-900"
-            >
+            <h2 id={titleId} className="text-xl font-bold text-slate-900">
               Leader Comments
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              {details?.stage}
-            </p>
+            <p className="mt-1 text-sm text-slate-500">{details?.stage}</p>
           </div>
 
           <button
@@ -524,9 +498,11 @@ function CommentsModal({ details, onClose }) {
             <p className="mt-1 text-base font-semibold text-slate-900">
               {details?.candidateName}
             </p>
-            <p className="mt-1 break-words font-mono text-xs text-slate-500">
-              {details?.applicationNumber}
+
+            <p className="mt-1 text-sm font-semibold text-blue-900">
+              Admission number: {details?.admissionNumber || "Not yet assigned"}
             </p>
+  
 
             <div className="mt-5 flex flex-wrap items-start justify-between gap-4 border-t border-slate-200 pt-4">
               <div>
@@ -545,9 +521,7 @@ function CommentsModal({ details, onClose }) {
           </section>
 
           <section className="mt-6">
-            <h3 className="text-sm font-semibold text-slate-900">
-              Comments
-            </h3>
+            <h3 className="text-sm font-semibold text-slate-900">Comments</h3>
             <div className="mt-3 min-h-[180px] rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
               <p className="whitespace-pre-wrap break-words text-base leading-8 text-slate-700">
                 {comments || "No comments recorded."}
@@ -581,9 +555,7 @@ function ApplicationStage({ application }) {
           {days} {days === 1 ? "day" : "days"} waiting
         </p>
       )}
-      {application.warning && (
-        <WarningBadge warning={application.warning} />
-      )}
+      {application.warning && <WarningBadge warning={application.warning} />}
     </div>
   );
 }
@@ -619,9 +591,7 @@ function SummaryCard({ label, value, description, color }) {
       >
         {value}
       </span>
-      <p className="mt-3 text-xs leading-5 text-slate-400">
-        {description}
-      </p>
+      <p className="mt-3 text-xs leading-5 text-slate-400">{description}</p>
     </article>
   );
 }
@@ -745,8 +715,7 @@ function formatDate(value) {
 }
 
 function isWaitingStatus(status) {
-  return [
-    "pending_local_endorsement",
-    "pending_final_endorsement",
-  ].includes(status);
+  return ["pending_local_endorsement", "pending_final_endorsement"].includes(
+    status,
+  );
 }
